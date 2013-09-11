@@ -23,6 +23,9 @@
 #include <stdexcept>
 #include "TpmBackend.h"
 
+#include <botan/botan.h>
+
+using namespace Botan;
 
 namespace crypto {
 
@@ -41,7 +44,7 @@ namespace crypto {
                 byteRandom.clear();
                 byteRandom << tpm::TpmBackend().getRandom(count);
             }
-            
+
             uint8_t num = byteRandom.get() % 128;
 
             if (allAscii) {
@@ -53,9 +56,19 @@ namespace crypto {
                     stringRandom += (char) num;
                 }
             }
-        }        
+        }
 
         return stringRandom;
+    }
+
+    std::string encrypt() {
+        PBKDF* pbkdf = get_pbkdf("PBKDF2(SHA-256)");
+        AutoSeeded_RNG rng;
+
+        secure_vector<byte> salt = rng.random_vec(16);
+        OctetString aes256_key = pbkdf->derive_key(32, "password",
+                &salt[0], salt.size(),
+                10000);
     }
 }
 #endif

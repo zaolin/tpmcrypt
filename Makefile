@@ -1,7 +1,7 @@
 CPP=g++
 CPPFLAGS=-ggdb -Wall -pedantic -Weffc++
 LD=g++
-LDFLAGS=-ltspi -lblkid -lbotan
+LDFLAGS=-ltspi -lblkid -lbotan-1.10
 
 tpmcrypt: $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 	$(LD) -o $@ $^ $(LDFLAGS)
