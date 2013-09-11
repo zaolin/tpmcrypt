@@ -28,13 +28,13 @@ namespace tools {
         SERPENT,
         TWOFISH,
         CAST,
-        MARS,
+        MARS
     };
     
     enum Mode {
         CBC,
         XTS,
-        XTS64,
+        XTS64
     };
     
     enum Hash {
@@ -42,19 +42,19 @@ namespace tools {
         SHA256,
         SHA512,
         WHIRLPOOL,
-        RIPEMD160,
+        RIPEMD160
     };
     
     enum KeySize {
         S128,
         S256,
         S384,
-        S512,
+        S512
     };
     
     enum Entropy {
         RANDOM,
-        URANDOM,
+        URANDOM
     };
 
     class ToolBackend {

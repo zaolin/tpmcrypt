@@ -32,9 +32,6 @@ using namespace crypto;
 using namespace tpm;
 using namespace tools;
 
-/*
- * 
- */
 int
 main(int argc, char** argv)
 {
@@ -53,11 +50,8 @@ main(int argc, char** argv)
 	
 	string encrypted = tpm.seal(rand.c_str(), rand.length(), 0, pcrs, password.c_str(), password.length());
 	tool.createVolume(device, rand, true, AES, XTS, SHA256, S512, URANDOM);
-	key.del("usb");
-	key.add("usb", device, encrypted, CryptSetup::TAG);
-	
-	VolumeKey vkey = key.get("usb");
-	string decrypted = tpm.unseal(vkey.getKey(), password.c_str(), password.length());
+	//key.del("usb");
+	string decrypted = tpm.unseal(encrypted, password.c_str(), password.length());
 	cout << decrypted << endl;
 	tool.openVolume(device, decrypted);
 	//tool.changeVolume(string(argv[1]), string(argv[2]), string(argv[3]));

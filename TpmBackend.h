@@ -60,14 +60,14 @@ namespace tpm {
         S5 = 0x6E, /// TPM is unowned but ready.
         S6 = 0x0A, /// TPM is cleared. Need reboot
         S7 = 0x64, /// TPM is resetted after clear command.
-        S8 = 0x00, /// TPM is completly off.
+        S8 = 0x00 /// TPM is completly off.
     };
     
     enum TpmManufactur {
         ATMEL,
         STM,
         INFINEON,
-        UNKNOWN,
+        UNKNOWN
     };
     
     enum TpmVersion {
@@ -104,7 +104,7 @@ namespace tpm {
             Owned = 0x01,
             Disabled = 0x00,
             Inactive = 0x00,
-            Unowned = 0x00,
+            Unowned = 0x00
         };
 
         void getEventLog();

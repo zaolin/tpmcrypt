@@ -20,7 +20,8 @@
 
 #include <iostream>
 #include <fstream>
-#include "VolumeKey.h"
+#include <list>
+#include "Volume.h"
 
 namespace tools {
 
@@ -29,18 +30,19 @@ namespace tools {
         KeyFile(std::string file);
         ~KeyFile();
 
-        void add(std::string name, std::string dev, std::string key, std::string tool);
-        void del(std::string name);
-        VolumeKey get(std::string name);
+        void add(Volume vol);
+        void del(std::string id);
+        Volume get(std::string id);
+        std::list<Volume> getAll();
 
     private:
         void parseFile();
         void flushFile();
-        std::vector<VolumeKey>::iterator searchFile(std::string name);
+        std::list<Volume>::iterator searchFile(std::string name);
 
         std::string keyFilePath;
         std::fstream keyFile;
-        std::vector<VolumeKey> volumeKeys;
+        std::list<Volume> volumes;
     };
 }
 

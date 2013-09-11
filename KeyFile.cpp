@@ -27,14 +27,15 @@ using namespace std;
 
 const static string BEGIN = "-----BEGIN VOLUME-----";
 const static string END = "-----END VOLUME-----";
-const static string NAME = "Name: ";
-const static string DEV = "Dev: ";
-const static string TOOL = "Tool: ";
+const static string NAME = "Volume Name: ";
+const static string DEV = "Device: ";
+const static string TOOL = "Encryption Tool: ";
+const static string MONCE = "Monce: ";
 
 KeyFile::KeyFile(string file) :
 keyFilePath(file),
 keyFile(),
-volumeKeys()
+volumes()
 {
 	this->parseFile();
 }
@@ -46,11 +47,8 @@ KeyFile::~KeyFile()
 
 void KeyFile::parseFile()
 {
-	string line;
+	string line, name, dev, tool, monce;
 	size_t found = 0;
-	string name;
-	string dev;
-	string tool;
 	stringstream ss;
 
 	keyFile.open(keyFilePath.c_str(), ios::in);
@@ -91,6 +89,15 @@ void KeyFile::parseFile()
 			}
 			
 			getline(keyFile, line);
+			found = line.find(MONCE);
+			
+			if(found == 0) {
+				monce = line.substr(MONCE.length());
+			} else {
+				continue;
+			}
+			
+			getline(keyFile, line);
 			if(!line.empty()) {
 				continue;
 			}
@@ -104,7 +111,7 @@ void KeyFile::parseFile()
 			getline(keyFile, line);
 			found = line.find(END);
 			if (found != std::string::npos) {
-				volumeKeys.push_back(VolumeKey(name, dev, ss.str(), tool));
+				volumes.push_back(Volume(name, dev, ss.str(), tool, monce));
 			}
 		} else {
 			continue;
@@ -124,12 +131,13 @@ void KeyFile::flushFile()
 
 	}
 
-	for (vector<VolumeKey>::iterator it = volumeKeys.begin(); it != volumeKeys.end(); ++it) {
+	for (list<Volume>::iterator it = volumes.begin(); it != volumes.end(); ++it) {
 		keyFile << BEGIN << endl;
 
 		keyFile << NAME << it->getName() << endl;
 		keyFile << DEV << it->getDev() << endl;
 		keyFile << TOOL << it->getTool() << endl;
+		keyFile << MONCE << it->getMonce() << endl;
 
 		ss << it->getKeyBase64() << endl;
 
@@ -157,50 +165,54 @@ void KeyFile::flushFile()
 	sync();
 }
 
-void KeyFile::add(string name, string dev, string key, string tool)
+void KeyFile::add(Volume vol)
 {
-	if (searchFile(name) != volumeKeys.end()) {
+	if (searchFile(vol.getName()) != volumes.end()) {
 		throw 1;
 	}
 
-	volumeKeys.push_back(VolumeKey(name, dev, key, tool));
+	volumes.push_back(vol);
 	flushFile();
 }
 
-void KeyFile::del(string name)
+void KeyFile::del(string id)
 {
-	vector<VolumeKey>::iterator it;
+	list<Volume>::iterator it;
 
-	it = searchFile(name);
+	it = searchFile(id);
 
-	if (it == volumeKeys.end()) {
+	if (it == volumes.end()) {
 		throw 1;
 	}
 
-	volumeKeys.erase(it);
+	volumes.erase(it);
 	flushFile();
 }
 
-VolumeKey KeyFile::get(string name)
+Volume KeyFile::get(string id)
 {
-	vector<VolumeKey>::iterator it;
+	list<Volume>::iterator it;
 
-	it = searchFile(name);
+	it = searchFile(id);
 
-	if (it == volumeKeys.end()) {
+	if (it == volumes.end()) {
 		throw 1;
 	}
 
 	return(*it);
 }
 
-vector<VolumeKey>::iterator KeyFile::searchFile(string name)
+list<Volume> KeyFile::getAll() {
+	return volumes;
+}
+
+list<Volume>::iterator KeyFile::searchFile(string name)
 {
-	for (vector<VolumeKey>::iterator it = volumeKeys.begin(); it != volumeKeys.end(); ++it) {
+	for (list<Volume>::iterator it = volumes.begin(); it != volumes.end(); ++it) {
 		if (it->getName() == name) {
 			return it;
 		}
 	}
 
-	return volumeKeys.end();
+	return volumes.end();
 }

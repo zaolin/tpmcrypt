@@ -65,7 +65,7 @@ string CryptSetup::openVolume(string dev, string password)
 		
 		stdout.push_back(password);
 
-		//call(ToolIdentifier, args, stdout, stdin, &ret);
+		call(ToolIdentifier, args, stdout, stdin, &ret);
 
 		if (ret) {
 			throw 1;
@@ -73,6 +73,8 @@ string CryptSetup::openVolume(string dev, string password)
 	} catch (exception &e) {
 
 	}
+	
+	return genUniqueName(dev);
 }
 
 void CryptSetup::closeVolume(string dev)

@@ -68,7 +68,6 @@ TpmBackend::~TpmBackend()
 void TpmBackend::preCalculatePcr()
 {
 	TSS_RESULT err;
-	TSS_HPCRS hPCR;
 	UINT32 eventNum;
 	TSS_PCR_EVENT *events;
 	stringstream ss;
@@ -81,7 +80,7 @@ void TpmBackend::preCalculatePcr()
 	for (unsigned int i = 0; i < eventNum; i++) {
 		cout << "next event" << endl;
 
-		for (int j = 0; j < events[i].ulPcrValueLength; j++) {
+		for (unsigned int j = 0; j < events[i].ulPcrValueLength; j++) {
 			ss << hex << setw(2) << setfill('0') << static_cast<const unsigned int> (events[i].rgbPcrValue[j]);
 		}
 		cout << events[i].ulPcrIndex << ": " << ss.str() << endl;
@@ -116,7 +115,7 @@ string TpmBackend::readPcr(size_t num)
 		throw TpmBackendException("TrouSers::TrouSers " + getException(err));
 	}
 
-	for (int j = 0; j < pcrValLen; j++) {
+	for (unsigned int j = 0; j < pcrValLen; j++) {
 		ss << hex << setw(2) << setfill('0') << static_cast<const unsigned int> (pcrVal[j]);
 	}
 
@@ -360,7 +359,6 @@ void TpmBackend::clear(const char * tpmPassword, size_t tpmPasswordLen)
 void TpmBackend::own(const char * tpmPassword, size_t tpmPasswordLen, const char * srkPassword, size_t srkPasswordLen)
 {
 	TSS_RESULT err;
-	TSS_UUID SRK_UUID = TSS_UUID_SRK;
 	TSS_HKEY hSRK;
 	TSS_HPOLICY hSrkPolicy;
 	TSS_HPOLICY hTpmPolicy;
@@ -414,7 +412,6 @@ string TpmBackend::seal(const char* toSeal, size_t len, int loc, vector<unsigned
 	TSS_UUID SRK_UUID = TSS_UUID_SRK;
 	TSS_HPCRS hPCR;
 	TSS_HPOLICY hPolicy;
-	int pcr_index;
 	UINT32 encLen;
 	UINT32 pcrvaluelength;
 	UINT32 locality;
@@ -611,7 +608,7 @@ TpmBackend::getRandom(size_t count)
 	string rand((const char*) random, count);
 
 	return rand;
-};
+}
 
 string
 TpmBackend::getException(TSS_RESULT err)
