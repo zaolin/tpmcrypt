@@ -21,22 +21,44 @@
 #include <cstdlib>
 #include <fstream>
 #include <unistd.h>
-#include "CryptoBackend.h"
-#include "TpmBackend.h"
-#include "CryptSetup.h"
-#include "Base64.h"
+#include "AuthenticationProtocol.h"
 #include "KeyFile.h"
+#include "CryptSetup.h"
+#include "TpmBackend.h"
+#include "CryptoBackend.h"
 
 using namespace std;
 using namespace crypto;
-using namespace tpm;
 using namespace tools;
+using namespace tpm;
 
 int
 main ( int argc, char** argv ) {
-    SecureString<char> foo;
 
-    foo = getPassword("Enter the password: ");
+    CryptSetup tool;
+    KeyFile file("keyfile.vol");
+    vector<unsigned> pcrs;
+    string pw = CryptoBackend().generateRandomString(64, false);
+    string monce = CryptoBackend().generateRandomString(64, false);
+    SecureString<char> secpw(const_cast < char* > (pw.c_str()), pw.length());
+    SecureString<char> secmonce(const_cast < char* > (monce.c_str()), monce.length());
+    SecureString<char> dummy;
+
+    for ( int i = 0; i < 24; i++ ) {
+        pcrs.push_back(i);
+    }
+
+    SecureString<char> password = CryptoBackend().getPassword("Enter password: ");
+
+    string encrypted1 = TpmBackend().seal(secpw, 0, pcrs, dummy);
+    string encrypted2 = TpmBackend().seal(secmonce, 0, pcrs, dummy);
+
+    tools::Volume vol("foo", "/dev/loop0", encrypted1, CryptSetup::TAG, encrypted2);
+
+    file.add(vol);
+
+    tool.createVolume("/dev/loop0", secpw, true, AES, CBC, SHA1, S256, RANDOM);
+    AuthenticationProtocol foo(vol);
 
     return 0;
 }

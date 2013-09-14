@@ -21,53 +21,20 @@
 #include <iostream>
 #include <string.h>
 #include <stdexcept>
-#include <random>
 #include <unistd.h>
+#include <sstream>
 
-#include "TpmBackend.h"
 #include "SecureString.h"
 
 namespace crypto {
 
-    std::string
-    generateRandomString(size_t count, bool allAscii) {
-        std::string stringRandom;
-        std::stringstream byteRandom;
+    class CryptoBackend {
+    public:
+        SecureString<char>
+        getPassword(const char *promt);
 
-        while (stringRandom.length() < count) {
-            if (byteRandom.eof()) {
-                byteRandom.clear();
-                //byteRandom << tpm::TpmBackend().getRandom(count);
-            }
-
-            uint8_t num = byteRandom.get() % 128;
-
-            if (allAscii) {
-                if (isgraph(num)) {
-                    stringRandom += (char) num;
-                }
-            } else {
-                if (isalnum(num)) {
-                    stringRandom += (char) num;
-                }
-            }
-        }
-
-        return stringRandom;
-    }
-
-    SecureString<char>
-    getPassword(const char *promt) {
-        char *password = getpass(promt);
-        SecureString<char> spassword;
-
-        spassword = SecureString<char>(password, strlen(password));
-
-        if (password != NULL) {
-            free(password);
-        }
-
-        return spassword;
-    }
+        std::string
+        generateRandomString(size_t count, bool allAscii);
+    };
 }
 #endif

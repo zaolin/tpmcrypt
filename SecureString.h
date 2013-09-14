@@ -41,7 +41,7 @@ namespace crypto {
         SecureString(T *t, size_t len) :
         pointer(),
         pointerLen() {
-            if (t == NULL || strlen(t) != len) {
+            if (t == NULL || len == 0) {
                 throw 1;
             }
 

@@ -16,6 +16,10 @@
  */
 
 #include "AuthenticationProtocol.h"
+#include "KeyFile.h"
+#include "Volume.h"
+#include "CryptSetup.h"
+#include "CryptoBackend.h"
 #include "TpmBackend.h"
 
 using namespace std;
@@ -38,8 +42,49 @@ using namespace tpm;
  */
 
 AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
+    SecureString<char> dummy;
+    CryptSetup tool;
+    vector<unsigned> pcrs;
 
+    for ( int i = 0; i < 24; i++ ) {
+        pcrs.push_back(i);
+    }
 
+    /// Unseal Monce
+    SecureString<char> decrypted = TpmBackend().unseal(volume.getMonce(), dummy);
+
+    /// Show Monce
+    cout << decrypted.getValue() << endl;
+
+    /// Get Password
+    SecureString<char> password = CryptoBackend().getPassword("Enter password: ");
+
+    /// Open Blob 1
+    SecureString<char> blob1 = TpmBackend().unseal(volume.getKey(), dummy);
+    string unsecure(const_cast < const char* > (blob1.getValue()), blob1.getLen());
+    string decoded(const_cast < const char* > (base64_decode(unsecure.c_str())));
+
+    /// Unseal Blob2
+    SecureString<char> blob2 = TpmBackend().unseal(decoded, dummy);
+
+    /// Open Volume
+    tool.openVolume(volume.getDev(), blob2);
+
+    /// Recalculate monce
+    string random = CryptoBackend().generateRandomString(4, false);
+    SecureString<char> newMonce(const_cast < char* > (random.c_str()), random.length());
+
+    /// Show Monce
+    cout << newMonce.getValue() << endl;
+
+    /// Seal Monce
+    std::string encrypted = TpmBackend().seal(newMonce, 0, pcrs, dummy);
+
+    /// Save Volume
+    KeyFile file("keyfile.vol");
+
+    file.del(volume.getName());
+    file.add(Volume(volume.getName(), volume.getDev(), volume.getKey(), volume.getTool(), encrypted));
 }
 
 AuthenticationProtocol::~AuthenticationProtocol ( ) {

@@ -269,6 +269,7 @@ void TpmBackend::changeSrkPassword ( crypto::SecureString<char> srkPasswordOld, 
     TSS_HPOLICY hTpmPolicy;
     TSS_HPOLICY hNewPolicy;
     TSS_UUID SRK_UUID = TSS_UUID_SRK;
+    BYTE well_known_secret[TPM_SHA1_160_HASH_LEN] = TSS_WELL_KNOWN_SECRET;
 
     if ( !this->isOwned() ) {
         throw TpmBackendException("TPM is not owned!");
@@ -289,12 +290,12 @@ void TpmBackend::changeSrkPassword ( crypto::SecureString<char> srkPasswordOld, 
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, srkPasswordOld.getLen(), reinterpret_cast < BYTE* > (srkPasswordOld.getValue()));
+        err = Tspi_Policy_SetSecret(hTpmPolicy, srkPasswordOld.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPasswordOld.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPasswordOld.getLen(), srkPasswordOld.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPasswordOld.getValue()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hNewPolicy, TSS_SECRET_MODE_PLAIN, srkPasswordNew.getLen(), reinterpret_cast < BYTE* > (srkPasswordNew.getValue()));
+        err = Tspi_Policy_SetSecret(hNewPolicy, srkPasswordNew.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPasswordNew.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPasswordNew.getLen(), srkPasswordNew.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPasswordNew.getValue()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
@@ -379,6 +380,7 @@ void TpmBackend::own ( crypto::SecureString<char> ownerPassword, crypto::SecureS
     TSS_HKEY hSRK;
     TSS_HPOLICY hSrkPolicy;
     TSS_HPOLICY hTpmPolicy;
+    BYTE well_known_secret[TPM_SHA1_160_HASH_LEN] = TSS_WELL_KNOWN_SECRET;
 
     if ( this->isOwned() ) {
         throw TpmBackendException("TPM already owned!");
@@ -402,7 +404,7 @@ void TpmBackend::own ( crypto::SecureString<char> ownerPassword, crypto::SecureS
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hSrkPolicy, TSS_SECRET_MODE_PLAIN, srkPassword.getLen(), reinterpret_cast < BYTE* > (srkPassword.getValue()));
+        err = Tspi_Policy_SetSecret(hSrkPolicy, srkPassword.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPassword.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPassword.getLen(), srkPassword.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPassword.getValue()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
@@ -471,7 +473,7 @@ string TpmBackend::seal ( crypto::SecureString<char> toSeal, int loc, std::vecto
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hPolicy, TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getValue()));
+        err = Tspi_Policy_SetSecret(hPolicy, password.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getValue()));
         if ( err != TSS_SUCCESS ) {
             Tspi_Context_CloseObject(hContext, hEncData);
             throw TpmBackendException("TPM Error: " + getException(err));
@@ -591,7 +593,7 @@ crypto::SecureString<char> TpmBackend::unseal ( const std::string &toUnseal, cry
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hPolicy, TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getValue()));
+        err = Tspi_Policy_SetSecret(hPolicy, password.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getValue()));
         if ( err != TSS_SUCCESS ) {
             Tspi_Context_CloseObject(hContext, hEncData);
             throw TpmBackendException("TPM Error: " + getException(err));
@@ -603,7 +605,7 @@ crypto::SecureString<char> TpmBackend::unseal ( const std::string &toUnseal, cry
             throw TpmBackendException("TPM Error: " + getException(err));
         }
     } catch ( exception &e ) {
-
+        cout << e.what() << endl;
     }
 
     try {
@@ -612,7 +614,7 @@ crypto::SecureString<char> TpmBackend::unseal ( const std::string &toUnseal, cry
             throw TpmBackendException("TPM Error: " + getException(err));
         }
     } catch ( exception &e ) {
-
+        cout << e.what() << endl;
     }
 
     return crypto::SecureString<char>(reinterpret_cast < char* > (plainData), plainLen);
