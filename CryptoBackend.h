@@ -1,6 +1,6 @@
-/* 
+/*
  *    This file is part of tpmcrypt.
- * 
+ *
  *    tpmcrypt is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation, either version 3 of the License, or
@@ -21,18 +21,13 @@
 #include <iostream>
 #include <string.h>
 #include <stdexcept>
+#include <random>
+#include <unistd.h>
+
 #include "TpmBackend.h"
-
-#include <botan/botan.h>
-
-using namespace Botan;
+#include "SecureString.h"
 
 namespace crypto {
-
-    template<typename T>
-    void clearMem(T* t, size_t len) {
-        memset(t, 0, sizeof (T) * len);
-    }
 
     std::string
     generateRandomString(size_t count, bool allAscii) {
@@ -42,7 +37,7 @@ namespace crypto {
         while (stringRandom.length() < count) {
             if (byteRandom.eof()) {
                 byteRandom.clear();
-                byteRandom << tpm::TpmBackend().getRandom(count);
+                //byteRandom << tpm::TpmBackend().getRandom(count);
             }
 
             uint8_t num = byteRandom.get() % 128;
@@ -61,14 +56,18 @@ namespace crypto {
         return stringRandom;
     }
 
-    std::string encrypt() {
-        PBKDF* pbkdf = get_pbkdf("PBKDF2(SHA-256)");
-        AutoSeeded_RNG rng;
+    SecureString<char>
+    getPassword(const char *promt) {
+        char *password = getpass(promt);
+        SecureString<char> spassword;
 
-        secure_vector<byte> salt = rng.random_vec(16);
-        OctetString aes256_key = pbkdf->derive_key(32, "password",
-                &salt[0], salt.size(),
-                10000);
+        spassword = SecureString<char>(password, strlen(password));
+
+        if (password != NULL) {
+            free(password);
+        }
+
+        return spassword;
     }
 }
 #endif

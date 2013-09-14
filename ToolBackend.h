@@ -1,6 +1,6 @@
-/* 
+/*
  *    This file is part of tpmcrypt.
- * 
+ *
  *    tpmcrypt is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation, either version 3 of the License, or
@@ -20,9 +20,10 @@
 
 #include <iostream>
 #include <list>
+#include "SecureString.h"
 
 namespace tools {
-    
+
     enum Cipher {
         AES,
         SERPENT,
@@ -30,13 +31,13 @@ namespace tools {
         CAST,
         MARS
     };
-    
+
     enum Mode {
         CBC,
         XTS,
         XTS64
     };
-    
+
     enum Hash {
         SHA1,
         SHA256,
@@ -44,14 +45,14 @@ namespace tools {
         WHIRLPOOL,
         RIPEMD160
     };
-    
+
     enum KeySize {
         S128,
         S256,
         S384,
         S512
     };
-    
+
     enum Entropy {
         RANDOM,
         URANDOM
@@ -61,18 +62,18 @@ namespace tools {
     public:
         ToolBackend();
         virtual ~ToolBackend();
-        
-        virtual std::string openVolume(std::string dev, std::string password) = 0;
+
+        virtual std::string openVolume(std::string dev, crypto::SecureString<char> password) = 0;
         virtual void closeVolume(std::string dev) = 0;
-        virtual void createVolume(std::string dev, 
-                            std::string password, bool force, Cipher c, Mode m,
-                            Hash h, KeySize k, Entropy e) = 0;
-        virtual void changeVolume(std::string dev, std::string password, std::string newPassword) = 0;
-        
+        virtual void createVolume(std::string dev,
+                crypto::SecureString<char> password, bool force, Cipher c, Mode m,
+                Hash h, KeySize k, Entropy e) = 0;
+        virtual void changeVolume(std::string dev, crypto::SecureString<char> password, crypto::SecureString<char> newPassword) = 0;
+
     protected:
-        void call(std::string executable, std::list<std::string> commands, std::list<std::string> toWrite, std::string &toRead, int *ret);
+        void call(std::string executable, std::list<std::string> commands, std::list<crypto::SecureString<char> > toWrite, std::string &toRead, int *ret);
         std::string genUniqueName(std::string dev);
-        
+
     private:
         virtual bool isTool(std::string dev) = 0;
         virtual bool isAvailable() = 0;
@@ -80,7 +81,7 @@ namespace tools {
         virtual std::string getHash(Hash h) = 0;
         virtual std::string getMode(Mode m) = 0;
         virtual std::string getKeySize(KeySize k) = 0;
-        virtual std::string getEntropy(Entropy e) = 0;    
+        virtual std::string getEntropy(Entropy e) = 0;
     };
 
 }

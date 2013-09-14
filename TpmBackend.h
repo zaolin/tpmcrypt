@@ -1,6 +1,6 @@
-/* 
+/*
  *    This file is part of tpmcrypt.
- * 
+ *
  *    tpmcrypt is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation, either version 3 of the License, or
@@ -30,6 +30,8 @@
 #include <trousers/trousers.h>
 #include <string.h>
 
+#include "SecureString.h"
+
 #define TSS_ERROR_CODE(x)       (x & 0xFFF)
 #define TSS_ERROR_LAYER(x)      (x & 0x3000)
 
@@ -42,6 +44,11 @@
 #define NULL_HCONTEXT   NULL_HOBJECT
 #define NULL_HDELFAMILY NULL_HOBJECT
 #define NULL_HPOLICY    NULL_HOBJECT
+
+/*
+ * TPM Implementation supports ATMEL, INFINEON and STM chips version <= 1.2
+ * which are built-in thinkpad and hellwet packard notebooks.
+ */
 
 namespace tpm {
 
@@ -62,14 +69,14 @@ namespace tpm {
         S7 = 0x64, /// TPM is resetted after clear command.
         S8 = 0x00 /// TPM is completly off.
     };
-    
+
     enum TpmManufactur {
         ATMEL,
         STM,
         INFINEON,
         UNKNOWN
     };
-    
+
     enum TpmVersion {
         T12,
         T11,
@@ -82,19 +89,19 @@ namespace tpm {
         TpmBackend();
         ~TpmBackend();
 
-        void changeSrkPassword(const char * srkPassword, size_t srkPasswordLen, const char* newPassword, size_t newPasswordLen);
-        void changeOwnerPassword(const char * tpmPassword, size_t tpmPasswordLen, const char* newPassword, size_t newPasswordLen);
+        void changeSrkPassword(crypto::SecureString<char> srkPasswordOld, crypto::SecureString<char> srkPasswordNew);
+        void changeOwnerPassword(crypto::SecureString<char> ownerPasswordOld, crypto::SecureString<char> ownerPasswordNew);
         void preCalculatePcr();
-        std::string sealBackup(const char* toSeal, size_t len, const char *password, size_t passwordLen);
+        std::string sealBackup(crypto::SecureString<char> toSeal, crypto::SecureString<char> password);
         std::map<unsigned, std::pair<std::string, std::string> > readPcrs();
         unsigned getPcrSize();
         TpmGlobalState getState();
         TpmManufactur getTpmManufactur();
-        void clear(const char * tpmPassword, size_t tpmPasswordLen);
-        void own(const char * password, size_t passwordLen, const char * srkPassword, size_t srkPasswordLen);
-        std::string seal(const char* toSeal, size_t len, int loc, std::vector<unsigned int> pcrs, const char *password, size_t passwordLen);
-        char* unseal(const std::string &toUnseal, const char *password, size_t len);
-        std::string getRandom(size_t count);
+        void clear(crypto::SecureString<char> ownerPassword);
+        void own(crypto::SecureString<char> ownerPassword, crypto::SecureString<char> srkPassword);
+        std::string seal(crypto::SecureString<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureString<char> password);
+        crypto::SecureString<char> unseal(const std::string &toUnseal, crypto::SecureString<char> password);
+        crypto::SecureString<char> getRandom(size_t count);
 
     private:
 

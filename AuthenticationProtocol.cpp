@@ -15,29 +15,34 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <string>
-#include <stdio.h>
-#include <cstdlib>
-#include <fstream>
-#include <unistd.h>
-#include "CryptoBackend.h"
+#include "AuthenticationProtocol.h"
 #include "TpmBackend.h"
-#include "CryptSetup.h"
-#include "Base64.h"
-#include "KeyFile.h"
 
 using namespace std;
 using namespace crypto;
-using namespace tpm;
 using namespace tools;
+using namespace tpm;
 
-int
-main ( int argc, char** argv ) {
-    SecureString<char> foo;
+/*
+ * 1. Unseal monce
+ * 2. Show monce
+ * 3. Get password
+ * 4. Open Blob 1
+ * 5. Unseal Blob 2
+ * 6. Open Volume
+ * 7. Recalculate monce
+ * 8. Show monce
+ * 9. Seal monce
+ * 10. Save volume
+ *
+ */
 
-    foo = getPassword("Enter the password: ");
+AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
 
-    return 0;
+
+}
+
+AuthenticationProtocol::~AuthenticationProtocol ( ) {
+
 }
 

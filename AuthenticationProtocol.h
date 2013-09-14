@@ -15,29 +15,22 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef AUTHENTICATIONPROTOCOL_H
+#define	AUTHENTICATIONPROTOCOL_H
+
 #include <iostream>
-#include <string>
-#include <stdio.h>
-#include <cstdlib>
-#include <fstream>
-#include <unistd.h>
-#include "CryptoBackend.h"
-#include "TpmBackend.h"
-#include "CryptSetup.h"
-#include "Base64.h"
-#include "KeyFile.h"
+#include "Volume.h"
 
-using namespace std;
-using namespace crypto;
-using namespace tpm;
-using namespace tools;
+namespace crypto {
 
-int
-main ( int argc, char** argv ) {
-    SecureString<char> foo;
+    class AuthenticationProtocol {
+    public:
+        AuthenticationProtocol(tools::Volume volume);
+        ~AuthenticationProtocol();
 
-    foo = getPassword("Enter the password: ");
-
-    return 0;
+    };
 }
+
+
+#endif	/* AUTHENTICATIONPROTOCOL_H */
 

@@ -1,6 +1,6 @@
-/* 
+/*
  *    This file is part of tpmcrypt.
- * 
+ *
  *    tpmcrypt is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
  *    the Free Software Foundation, either version 3 of the License, or
@@ -22,20 +22,20 @@
 #include "ToolBackend.h"
 
 namespace tools {
-    
+
     class CryptSetup : public ToolBackend {
     public:
         const static std::string TAG;
-        
+
         ~CryptSetup();
-        
-        std::string openVolume(std::string dev, std::string password);
+
+        std::string openVolume(std::string dev, crypto::SecureString<char> password);
         void closeVolume(std::string dev);
-        void createVolume(std::string dev, std::string password, 
-                    bool force, Cipher c, Mode m,
-                    Hash h, KeySize k, Entropy e);
-        void changeVolume(std::string dev, std::string password, std::string newPassword);
-        
+        void createVolume(std::string dev, crypto::SecureString<char> password,
+                bool force, Cipher c, Mode m,
+                Hash h, KeySize k, Entropy e);
+        void changeVolume(std::string dev, crypto::SecureString<char> password, crypto::SecureString<char> newPassword);
+
     private:
         std::string getCipher(Cipher c);
         std::string getHash(Hash h);
