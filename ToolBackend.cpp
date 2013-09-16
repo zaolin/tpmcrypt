@@ -40,7 +40,7 @@ ToolBackend::~ToolBackend ( ) {
 
 }
 
-void ToolBackend::call ( string executable, list<string> commands, list<crypto::SecureString<char> > toWrite, string &toRead, int *ret ) {
+void ToolBackend::call ( string executable, list<string> commands, list<crypto::SecureMem<char> > toWrite, string &toRead, int *ret ) {
     char buf[255];
     char* args[255];
     char* envp[2];
@@ -81,8 +81,8 @@ void ToolBackend::call ( string executable, list<string> commands, list<crypto::
     close(out[0]);
     close(in[1]);
 
-    for ( list<crypto::SecureString<char> >::iterator it = toWrite.begin(); it != toWrite.end(); it++ ) {
-        write(out[1], it->getValue(), it->getLen());
+    for ( list<crypto::SecureMem<char> >::iterator it = toWrite.begin(); it != toWrite.end(); it++ ) {
+        write(out[1], it->getPointer(), it->getLen());
         write(out[1], "\n", 1);
     }
 

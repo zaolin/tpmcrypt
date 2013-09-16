@@ -67,7 +67,7 @@ void TpmBackend::preCalculatePcr ( ) {
 
 }
 
-string TpmBackend::sealBackup ( crypto::SecureString<char> toSeal, crypto::SecureString<char> password ) {
+string TpmBackend::sealBackup ( crypto::SecureMem<char> toSeal, crypto::SecureMem<char> password ) {
     unsigned loc = 0;
     string emptyPcr = "0000000000000000000000000000000000000000";
 
@@ -210,7 +210,7 @@ TpmManufactur TpmBackend::getTpmManufactur ( ) {
     }
 }
 
-void TpmBackend::changeOwnerPassword ( crypto::SecureString<char> ownerPasswordOld, crypto::SecureString<char> ownerPasswordNew ) {
+void TpmBackend::changeOwnerPassword ( crypto::SecureMem<char> ownerPasswordOld, crypto::SecureMem<char> ownerPasswordNew ) {
     TSS_RESULT err;
     TSS_HPOLICY hTpmPolicy;
     TSS_HPOLICY hNewPolicy;
@@ -230,12 +230,12 @@ void TpmBackend::changeOwnerPassword ( crypto::SecureString<char> ownerPasswordO
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, ownerPasswordOld.getLen(), reinterpret_cast < BYTE* > (ownerPasswordOld.getValue()));
+        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, ownerPasswordOld.getLen(), reinterpret_cast < BYTE* > (ownerPasswordOld.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hNewPolicy, TSS_SECRET_MODE_PLAIN, ownerPasswordNew.getLen(), reinterpret_cast < BYTE* > (ownerPasswordNew.getValue()));
+        err = Tspi_Policy_SetSecret(hNewPolicy, TSS_SECRET_MODE_PLAIN, ownerPasswordNew.getLen(), reinterpret_cast < BYTE* > (ownerPasswordNew.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
@@ -263,7 +263,7 @@ void TpmBackend::changeOwnerPassword ( crypto::SecureString<char> ownerPasswordO
     }
 }
 
-void TpmBackend::changeSrkPassword ( crypto::SecureString<char> srkPasswordOld, crypto::SecureString<char> srkPasswordNew ) {
+void TpmBackend::changeSrkPassword ( crypto::SecureMem<char> srkPasswordOld, crypto::SecureMem<char> srkPasswordNew ) {
     TSS_RESULT err;
     TSS_HKEY hSRK;
     TSS_HPOLICY hTpmPolicy;
@@ -290,12 +290,12 @@ void TpmBackend::changeSrkPassword ( crypto::SecureString<char> srkPasswordOld, 
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hTpmPolicy, srkPasswordOld.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPasswordOld.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPasswordOld.getLen(), srkPasswordOld.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPasswordOld.getValue()));
+        err = Tspi_Policy_SetSecret(hTpmPolicy, srkPasswordOld.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPasswordOld.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPasswordOld.getLen(), srkPasswordOld.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPasswordOld.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hNewPolicy, srkPasswordNew.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPasswordNew.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPasswordNew.getLen(), srkPasswordNew.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPasswordNew.getValue()));
+        err = Tspi_Policy_SetSecret(hNewPolicy, srkPasswordNew.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPasswordNew.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPasswordNew.getLen(), srkPasswordNew.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPasswordNew.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
@@ -323,7 +323,7 @@ void TpmBackend::changeSrkPassword ( crypto::SecureString<char> srkPasswordOld, 
     }
 }
 
-void TpmBackend::clear ( crypto::SecureString<char> ownerPassword ) {
+void TpmBackend::clear ( crypto::SecureMem<char> ownerPassword ) {
     TSS_RESULT err;
     TSS_RESULT err2;
     TSS_HPOLICY hTpmPolicy;
@@ -338,7 +338,7 @@ void TpmBackend::clear ( crypto::SecureString<char> ownerPassword ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, ownerPassword.getLen(), reinterpret_cast < BYTE* > (ownerPassword.getValue()));
+        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, ownerPassword.getLen(), reinterpret_cast < BYTE* > (ownerPassword.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
@@ -375,7 +375,7 @@ void TpmBackend::clear ( crypto::SecureString<char> ownerPassword ) {
     }
 }
 
-void TpmBackend::own ( crypto::SecureString<char> ownerPassword, crypto::SecureString<char> srkPassword ) {
+void TpmBackend::own ( crypto::SecureMem<char> ownerPassword, crypto::SecureMem<char> srkPassword ) {
     TSS_RESULT err;
     TSS_HKEY hSRK;
     TSS_HPOLICY hSrkPolicy;
@@ -404,12 +404,12 @@ void TpmBackend::own ( crypto::SecureString<char> ownerPassword, crypto::SecureS
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hSrkPolicy, srkPassword.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPassword.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPassword.getLen(), srkPassword.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPassword.getValue()));
+        err = Tspi_Policy_SetSecret(hSrkPolicy, srkPassword.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPassword.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPassword.getLen(), srkPassword.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPassword.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, ownerPassword.getLen(), reinterpret_cast < BYTE* > (ownerPassword.getValue()));
+        err = Tspi_Policy_SetSecret(hTpmPolicy, TSS_SECRET_MODE_PLAIN, ownerPassword.getLen(), reinterpret_cast < BYTE* > (ownerPassword.getPointer()));
         if ( err != TSS_SUCCESS ) {
             throw TpmBackendException("TPM Error: " + getException(err));
         }
@@ -437,7 +437,7 @@ void TpmBackend::own ( crypto::SecureString<char> ownerPassword, crypto::SecureS
     }
 }
 
-string TpmBackend::seal ( crypto::SecureString<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureString<char> password ) {
+string TpmBackend::seal ( crypto::SecureMem<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureMem<char> password ) {
     TSS_HKEY hSRK;
     TSS_HENCDATA hEncData;
     TSS_UUID SRK_UUID = TSS_UUID_SRK;
@@ -473,7 +473,7 @@ string TpmBackend::seal ( crypto::SecureString<char> toSeal, int loc, std::vecto
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hPolicy, password.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getValue()));
+        err = Tspi_Policy_SetSecret(hPolicy, password.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getPointer()));
         if ( err != TSS_SUCCESS ) {
             Tspi_Context_CloseObject(hContext, hEncData);
             throw TpmBackendException("TPM Error: " + getException(err));
@@ -526,7 +526,7 @@ string TpmBackend::seal ( crypto::SecureString<char> toSeal, int loc, std::vecto
             pcrvalue = NULL;
         }
 
-        err = Tspi_Data_Seal(hEncData, hSRK, toSeal.getLen(), reinterpret_cast < BYTE* > (toSeal.getValue()), hPCR);
+        err = Tspi_Data_Seal(hEncData, hSRK, toSeal.getLen(), reinterpret_cast < BYTE* > (toSeal.getPointer()), hPCR);
         if ( err != TSS_SUCCESS ) {
             Tspi_Context_CloseObject(hContext, hEncData);
             throw TpmBackendException("TPM Error: " + getException(err));
@@ -556,7 +556,7 @@ string TpmBackend::seal ( crypto::SecureString<char> toSeal, int loc, std::vecto
     return encryptedData;
 }
 
-crypto::SecureString<char> TpmBackend::unseal ( const std::string &toUnseal, crypto::SecureString<char> password ) {
+crypto::SecureMem<char> TpmBackend::unseal ( const std::string &toUnseal, crypto::SecureMem<char> password ) {
     TSS_HKEY hSRK;
     TSS_HENCDATA hEncData;
     TSS_HPOLICY hPolicy;
@@ -593,7 +593,7 @@ crypto::SecureString<char> TpmBackend::unseal ( const std::string &toUnseal, cry
             throw TpmBackendException("TPM Error: " + getException(err));
         }
 
-        err = Tspi_Policy_SetSecret(hPolicy, password.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getValue()));
+        err = Tspi_Policy_SetSecret(hPolicy, password.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, password.isEmpty() ? TPM_SHA1_160_HASH_LEN : password.getLen(), password.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (password.getPointer()));
         if ( err != TSS_SUCCESS ) {
             Tspi_Context_CloseObject(hContext, hEncData);
             throw TpmBackendException("TPM Error: " + getException(err));
@@ -617,10 +617,10 @@ crypto::SecureString<char> TpmBackend::unseal ( const std::string &toUnseal, cry
         cout << e.what() << endl;
     }
 
-    return crypto::SecureString<char>(reinterpret_cast < char* > (plainData), plainLen);
+    return crypto::SecureMem<char>(reinterpret_cast < char* > (plainData), plainLen);
 }
 
-crypto::SecureString<char> TpmBackend::getRandom ( size_t count ) {
+crypto::SecureMem<char> TpmBackend::getRandom ( size_t count ) {
     BYTE * random;
     TSS_RESULT err;
 
@@ -636,7 +636,7 @@ crypto::SecureString<char> TpmBackend::getRandom ( size_t count ) {
         throw TpmBackendException("TPM Error: " + getException(err));
     }
 
-    return crypto::SecureString<char>(reinterpret_cast < char* > (random), count);
+    return crypto::SecureMem<char>(reinterpret_cast < char* > (random), count);
 }
 
 string

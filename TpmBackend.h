@@ -30,7 +30,7 @@
 #include <trousers/trousers.h>
 #include <string.h>
 
-#include "SecureString.h"
+#include "SecureMem.h"
 
 #define TSS_ERROR_CODE(x)       (x & 0xFFF)
 #define TSS_ERROR_LAYER(x)      (x & 0x3000)
@@ -89,19 +89,19 @@ namespace tpm {
         TpmBackend();
         ~TpmBackend();
 
-        void changeSrkPassword(crypto::SecureString<char> srkPasswordOld, crypto::SecureString<char> srkPasswordNew);
-        void changeOwnerPassword(crypto::SecureString<char> ownerPasswordOld, crypto::SecureString<char> ownerPasswordNew);
+        void changeSrkPassword(crypto::SecureMem<char> srkPasswordOld, crypto::SecureMem<char> srkPasswordNew);
+        void changeOwnerPassword(crypto::SecureMem<char> ownerPasswordOld, crypto::SecureMem<char> ownerPasswordNew);
         void preCalculatePcr();
-        std::string sealBackup(crypto::SecureString<char> toSeal, crypto::SecureString<char> password);
+        std::string sealBackup(crypto::SecureMem<char> toSeal, crypto::SecureMem<char> password);
         std::map<unsigned, std::pair<std::string, std::string> > readPcrs();
         unsigned getPcrSize();
         TpmGlobalState getState();
         TpmManufactur getTpmManufactur();
-        void clear(crypto::SecureString<char> ownerPassword);
-        void own(crypto::SecureString<char> ownerPassword, crypto::SecureString<char> srkPassword);
-        std::string seal(crypto::SecureString<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureString<char> password);
-        crypto::SecureString<char> unseal(const std::string &toUnseal, crypto::SecureString<char> password);
-        crypto::SecureString<char> getRandom(size_t count);
+        void clear(crypto::SecureMem<char> ownerPassword);
+        void own(crypto::SecureMem<char> ownerPassword, crypto::SecureMem<char> srkPassword);
+        std::string seal(crypto::SecureMem<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureMem<char> password);
+        crypto::SecureMem<char> unseal(const std::string &toUnseal, crypto::SecureMem<char> password);
+        crypto::SecureMem<char> getRandom(size_t count);
 
     private:
 

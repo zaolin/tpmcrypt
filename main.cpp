@@ -40,15 +40,15 @@ main ( int argc, char** argv ) {
     vector<unsigned> pcrs;
     string pw = CryptoBackend().generateRandomString(64, false);
     string monce = CryptoBackend().generateRandomString(64, false);
-    SecureString<char> secpw(const_cast < char* > (pw.c_str()), pw.length());
-    SecureString<char> secmonce(const_cast < char* > (monce.c_str()), monce.length());
-    SecureString<char> dummy;
+    SecureMem<char> secpw(const_cast < char* > (pw.c_str()), pw.length());
+    SecureMem<char> secmonce(const_cast < char* > (monce.c_str()), monce.length());
+    SecureMem<char> dummy;
 
     for ( int i = 0; i < 24; i++ ) {
         pcrs.push_back(i);
     }
 
-    SecureString<char> password = CryptoBackend().getPassword("Enter password: ");
+    SecureMem<char> password = CryptoBackend().getPassword("Enter password: ");
 
     string encrypted1 = TpmBackend().seal(secpw, 0, pcrs, dummy);
     string encrypted2 = TpmBackend().seal(secmonce, 0, pcrs, dummy);

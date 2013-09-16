@@ -29,12 +29,12 @@ namespace tools {
 
         ~CryptSetup();
 
-        std::string openVolume(std::string dev, crypto::SecureString<char> password);
+        std::string openVolume(std::string dev, crypto::SecureMem<char> password);
         void closeVolume(std::string dev);
-        void createVolume(std::string dev, crypto::SecureString<char> password,
+        void createVolume(std::string dev, crypto::SecureMem<char> password,
                 bool force, Cipher c, Mode m,
                 Hash h, KeySize k, Entropy e);
-        void changeVolume(std::string dev, crypto::SecureString<char> password, crypto::SecureString<char> newPassword);
+        void changeVolume(std::string dev, crypto::SecureMem<char> password, crypto::SecureMem<char> newPassword);
 
     private:
         std::string getCipher(Cipher c);

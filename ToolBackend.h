@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <list>
-#include "SecureString.h"
+#include "SecureMem.h"
 
 namespace tools {
 
@@ -63,15 +63,15 @@ namespace tools {
         ToolBackend();
         virtual ~ToolBackend();
 
-        virtual std::string openVolume(std::string dev, crypto::SecureString<char> password) = 0;
+        virtual std::string openVolume(std::string dev, crypto::SecureMem<char> password) = 0;
         virtual void closeVolume(std::string dev) = 0;
         virtual void createVolume(std::string dev,
-                crypto::SecureString<char> password, bool force, Cipher c, Mode m,
+                crypto::SecureMem<char> password, bool force, Cipher c, Mode m,
                 Hash h, KeySize k, Entropy e) = 0;
-        virtual void changeVolume(std::string dev, crypto::SecureString<char> password, crypto::SecureString<char> newPassword) = 0;
+        virtual void changeVolume(std::string dev, crypto::SecureMem<char> password, crypto::SecureMem<char> newPassword) = 0;
 
     protected:
-        void call(std::string executable, std::list<std::string> commands, std::list<crypto::SecureString<char> > toWrite, std::string &toRead, int *ret);
+        void call(std::string executable, std::list<std::string> commands, std::list<crypto::SecureMem<char> > toWrite, std::string &toRead, int *ret);
         std::string genUniqueName(std::string dev);
 
     private:

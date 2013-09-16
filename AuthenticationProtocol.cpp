@@ -42,7 +42,7 @@ using namespace tpm;
  */
 
 AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
-    SecureString<char> dummy;
+    SecureMem<char> dummy;
     CryptSetup tool;
     vector<unsigned> pcrs;
 
@@ -51,31 +51,31 @@ AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
     }
 
     /// Unseal Monce
-    SecureString<char> decrypted = TpmBackend().unseal(volume.getMonce(), dummy);
+    SecureMem<char> decrypted = TpmBackend().unseal(volume.getMonce(), dummy);
 
     /// Show Monce
-    cout << decrypted.getValue() << endl;
+    cout << decrypted.getPointer() << endl;
 
     /// Get Password
-    SecureString<char> password = CryptoBackend().getPassword("Enter password: ");
+    SecureMem<char> password = CryptoBackend().getPassword("Enter password: ");
 
     /// Open Blob 1
-    SecureString<char> blob1 = TpmBackend().unseal(volume.getKey(), dummy);
-    string unsecure(const_cast < const char* > (blob1.getValue()), blob1.getLen());
+    SecureMem<char> blob1 = TpmBackend().unseal(volume.getKey(), dummy);
+    string unsecure(const_cast < const char* > (blob1.getPointer()), blob1.getLen());
     string decoded(const_cast < const char* > (base64_decode(unsecure.c_str())));
 
     /// Unseal Blob2
-    SecureString<char> blob2 = TpmBackend().unseal(decoded, dummy);
+    SecureMem<char> blob2 = TpmBackend().unseal(decoded, dummy);
 
     /// Open Volume
     tool.openVolume(volume.getDev(), blob2);
 
     /// Recalculate monce
     string random = CryptoBackend().generateRandomString(4, false);
-    SecureString<char> newMonce(const_cast < char* > (random.c_str()), random.length());
+    SecureMem<char> newMonce(const_cast < char* > (random.c_str()), random.length());
 
     /// Show Monce
-    cout << newMonce.getValue() << endl;
+    cout << newMonce.getPointer() << endl;
 
     /// Seal Monce
     std::string encrypted = TpmBackend().seal(newMonce, 0, pcrs, dummy);

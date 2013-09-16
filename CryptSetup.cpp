@@ -34,10 +34,10 @@ CryptSetup::~CryptSetup ( ) {
 
 }
 
-string CryptSetup::openVolume ( string dev, crypto::SecureString<char> password ) {
+string CryptSetup::openVolume ( string dev, crypto::SecureMem<char> password ) {
     int ret = 1;
     list<string> args;
-    list<crypto::SecureString<char> > stdout;
+    list<crypto::SecureMem<char> > stdout;
     string stdin;
 
     try {
@@ -78,7 +78,7 @@ string CryptSetup::openVolume ( string dev, crypto::SecureString<char> password 
 void CryptSetup::closeVolume ( string dev ) {
     list<string> args;
     string stdin;
-    list<crypto::SecureString<char> > stdout;
+    list<crypto::SecureMem<char> > stdout;
     int ret = 1;
 
     if ( !this->isAvailable() ) {
@@ -107,12 +107,12 @@ void CryptSetup::closeVolume ( string dev ) {
     }
 }
 
-void CryptSetup::createVolume ( string dev, crypto::SecureString<char> password, bool force,
+void CryptSetup::createVolume ( string dev, crypto::SecureMem<char> password, bool force,
                                 Cipher c, Mode m, Hash h, KeySize k, Entropy e ) {
     list<string> args;
     stringstream ss;
     string stdin;
-    list<crypto::SecureString<char> > stdout;
+    list<crypto::SecureMem<char> > stdout;
     int ret = 1;
 
     if ( !this->isAvailable() ) {
@@ -148,9 +148,9 @@ void CryptSetup::createVolume ( string dev, crypto::SecureString<char> password,
     }
 }
 
-void CryptSetup::changeVolume ( string dev, crypto::SecureString<char> password, crypto::SecureString<char> newPassword ) {
+void CryptSetup::changeVolume ( string dev, crypto::SecureMem<char> password, crypto::SecureMem<char> newPassword ) {
     list<string> args;
-    list<crypto::SecureString<char> > stdout;
+    list<crypto::SecureMem<char> > stdout;
     int ret = 1;
     string stdin;
 
@@ -181,7 +181,7 @@ void CryptSetup::changeVolume ( string dev, crypto::SecureString<char> password,
 
 bool CryptSetup::isTool ( string dev ) {
     list<string> args;
-    list<crypto::SecureString<char> > stdout;
+    list<crypto::SecureMem<char> > stdout;
     string stdin;
     int ret = 1;
 
@@ -195,7 +195,7 @@ bool CryptSetup::isTool ( string dev ) {
 
 bool CryptSetup::isAvailable ( ) {
     list<string> args;
-    list<crypto::SecureString<char> > stdout;
+    list<crypto::SecureMem<char> > stdout;
     string stdin;
     int ret = 1;
 

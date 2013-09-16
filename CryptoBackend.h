@@ -24,13 +24,13 @@
 #include <unistd.h>
 #include <sstream>
 
-#include "SecureString.h"
+#include "SecureMem.h"
 
 namespace crypto {
 
     class CryptoBackend {
     public:
-        SecureString<char>
+        SecureMem<char>
         getPassword(const char *promt);
 
         std::string

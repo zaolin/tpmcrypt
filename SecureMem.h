@@ -15,14 +15,23 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SECURESTRING_H
-#define	SECURESTRING_H
+#ifndef SECUREMEM_H
+#define	SECUREMEM_H
 
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/mman.h>
+#include <botan/botan.h>
 
 namespace crypto {
+    
+    class SecureMemException : public std::runtime_error {
+    public:
+
+        SecureMemException(const std::string& _message) : std::runtime_error(_message) {
+        }
+    };
 
     template<typename T>
     void clearMem(T* t, size_t len) {
@@ -30,60 +39,79 @@ namespace crypto {
     }
 
     template<typename T>
-    class SecureString {
+    class SecureMem {
     public:
 
-        SecureString() :
+        SecureMem() :
         pointer(NULL),
         pointerLen(0) {
         }
 
-        SecureString(T *t, size_t len) :
+        SecureMem(T *t, size_t len) :
         pointer(),
         pointerLen() {
             if (t == NULL || len == 0) {
-                throw 1;
+                throw SecureMemException("");
             }
 
             pointerLen = len;
             pointer = new T[pointerLen];
+            
+            if(mlock(pointer, pointerLen) < 0) {
+                throw SecureMemException("");
+            }
 
             memcpy(pointer, t, pointerLen);
 
+            if(mlock(t, len) < 0) {
+                throw SecureMemException("");
+            }
+            
             clearMem(t, len);
+            munlock(t, len);
         }
 
-        SecureString(const SecureString& rhs) :
+        SecureMem(const SecureMem& rhs) :
         pointer(),
         pointerLen() {
             pointer = new T[rhs.pointerLen];
             pointerLen = rhs.pointerLen;
+            
+            if(mlock(pointer, pointerLen) < 0) {
+                throw SecureMemException("");
+            }
 
             memcpy(pointer, rhs.pointer, rhs.pointerLen);
         }
 
-        SecureString &operator=(const SecureString& rhs) {
+        SecureMem &operator=(const SecureMem& rhs) {
             if (pointer != NULL) {
                 clearMem(pointer, pointerLen);
+                munlock(pointer, pointerLen);
                 delete[] pointer;
             }
 
             pointer = new T[rhs.pointerLen];
             pointerLen = rhs.pointerLen;
+            
+            if(mlock(pointer, pointerLen) < 0) {
+                throw SecureMemException("");
+            }
 
             memcpy(pointer, rhs.pointer, rhs.pointerLen);
 
             return *this;
         }
 
-        ~SecureString() {
+        ~SecureMem() {
             if (pointer != NULL) {
                 clearMem(pointer, pointerLen);
-                free(pointer);
+                munlock(pointer, pointerLen);
+                delete[] pointer;
             }
         }
 
-        T* getValue() {
+        T* getPointer() {
             pointer[pointerLen] = 0;
 
             return pointer;
@@ -91,6 +119,10 @@ namespace crypto {
 
         size_t getLen() {
             return pointerLen;
+        }
+        
+        std::string getAsUnsecureString() {
+            return std::string(const_cast<const char*>(reinterpret_cast<char*>(pointer)), pointerLen);
         }
 
         bool isEmpty() {
@@ -100,9 +132,8 @@ namespace crypto {
     private:
         T *pointer;
         size_t pointerLen;
-
     };
 }
 
-#endif	/* SECURESTRING_H */
+#endif	/* SECUREMEM_H */
 
