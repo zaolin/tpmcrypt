@@ -63,7 +63,9 @@ main ( int argc, char** argv ) {
     tool.createVolume("/dev/loop0", secpw, true, AES, CBC, SHA1, S256, RANDOM);
     AuthenticationProtocol foo(vol);
 */
-    TpmStateMachine();
+    SecureMem<char> foo = CryptoBackend().generateRandomString(64, false); 
+    cout << foo.getAsUnsecureString() << endl;
+    //TpmStateMachine();
     return 0;
 }
 

@@ -1,5 +1,5 @@
 CPP=g++
-CPPFLAGS=-O2 -ggdb -Wall -pedantic -Weffc++ -std=c++11 \
+CPPFLAGS=-O2 -ggdb -Wall -pedantic -Weffc++ -std=c++11 -Wextra \
 	 -Wformat -Wformat-security -Werror=format-security \
 	 -D_FORTIFY_SOURCE=2 -fstack-protector-all --param ssp-buffer-size=4 \
 	 -fpic -pie -I.

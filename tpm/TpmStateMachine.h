@@ -29,6 +29,7 @@ namespace tpm {
 		~TpmStateMachine();	
 	private:
 		void needOwnership();		
+		void needReboot();		
 
 		TpmGlobalState currentTpmState;
 	};

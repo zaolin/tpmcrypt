@@ -73,7 +73,7 @@ AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
     tool.openVolume(volume.getDev(), blob2);
 
     /// Recalculate monce
-    string random = CryptoBackend().generateRandomString(4, false);
+    string random; // = CryptoBackend().generateRandomString(4, false);
     SecureMem<char> newMonce(const_cast < char* > (random.c_str()), random.length());
 
     /// Show Monce

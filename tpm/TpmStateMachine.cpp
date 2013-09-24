@@ -16,10 +16,17 @@
  */
 
 #include <tpm/TpmStateMachine.h>
+#include <crypto/CryptoBackend.h>
 #include <utils/Logging.h>
+
+#include <unistd.h>
+#include <linux/reboot.h>
+#include <sys/reboot.h>
 
 using namespace tpm;
 using namespace utils;
+using namespace crypto;
+using namespace std;
 
 TpmStateMachine::TpmStateMachine() :
 currentTpmState() {
@@ -40,13 +47,15 @@ currentTpmState() {
 			 needOwnership();
 		break;
 
-		case S6:
+		case S6: Logging(LOG_INFO, "Tpm is cleared need to reboot !");
+			 needReboot();
 		break;
 
 		case S7:
 		break;
 
-		case S8:
+		case S8: Logging(LOG_INFO, "Tpm is disabled, please activate tpm in bios configuration !");
+			 
 		break;
 
 		default:
@@ -59,5 +68,18 @@ TpmStateMachine::~TpmStateMachine() {
 }
 
 void TpmStateMachine::needOwnership() {
+	TpmBackend tpmConnection;
+	SecureMem<char> ownerPassphrase, srkPassphrase;
+	
+	cout << "Tpm needs to be owned, ownership not set. Will guide you wisely !" << endl;	
+	ownerPassphrase = CryptoBackend().getPassword("Please enter a owner passphrase: ");
+	tpmConnection.own(ownerPassphrase, srkPassphrase);
+	Logging(LOG_INFO, "Owning of tpm successfully !");
+}
 
+void TpmStateMachine::needReboot() {
+	Logging(LOG_INFO, "Restarting the system !");
+
+	sync();
+	reboot(LINUX_REBOOT_CMD_RESTART);
 }

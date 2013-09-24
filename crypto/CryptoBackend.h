@@ -33,7 +33,7 @@ namespace crypto {
         utils::SecureMem<char>
         getPassword(const char *promt);
 
-        std::string
+        utils::SecureMem<char>
         generateRandomString(size_t count, bool allAscii);
     };
 }

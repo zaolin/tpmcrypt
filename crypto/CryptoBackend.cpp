@@ -11,34 +11,36 @@ using namespace utils;
 const static string KEY_DERIVATION = "PBKDF2(SHA-256)";
 const static string ALGORITHM = "AES-256/CBC";
 
-string
+SecureMem<char>
 CryptoBackend::generateRandomString(size_t count, bool allAscii)
 {
+	size_t counter = 0;
 	std::random_device rng;
 	std::uniform_int_distribution<int> dist(0, 255);
-	std::string stringRandom;
-	std::stringstream byteRandom;
-
-	while (stringRandom.length() < count) {
-		if (byteRandom.eof()) {
-			byteRandom.clear();
-			byteRandom << (char) dist(rng);
-		}
-
-		uint8_t num = byteRandom.get() % 128;
+	char byteRand;
+	char *random = (char*)calloc(count, sizeof(char));
+	
+	while (strlen(random) < count) {
+		byteRand = (char) dist(rng) % 128;
 
 		if (allAscii) {
-			if (isgraph(num)) {
-				stringRandom += (char) num;
+			if (isgraph(byteRand)) {
+				random[counter++] = byteRand;
 			}
 		} else {
-			if (isalnum(num)) {
-				stringRandom += (char) num;
+			if (isalnum(byteRand)) {
+				random[counter++] = byteRand;
 			}
 		}
 	}
-
-	return stringRandom;
+	byteRand = (char) 0;
+	SecureMem<char> randomString(random, count);
+	
+	if(random != NULL) {
+		free(random);
+	}
+	
+	return randomString;
 }
 
 SecureMem<char>
