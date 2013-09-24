@@ -19,9 +19,9 @@
 #define	VOLUME_H
 
 #include <iostream>
-#include "Base64.h"
+#include <externals/Base64.h>
 
-namespace tools {
+namespace utils {
 
     class Volume {
     public:

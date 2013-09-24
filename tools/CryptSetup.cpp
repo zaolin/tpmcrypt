@@ -15,13 +15,14 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CryptSetup.h"
+#include <tools/CryptSetup.h>
 #include <sstream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <list>
 #include <stdexcept>
 
+using namespace utils;
 using namespace tools;
 using namespace std;
 
@@ -34,10 +35,10 @@ CryptSetup::~CryptSetup ( ) {
 
 }
 
-string CryptSetup::openVolume ( string dev, crypto::SecureMem<char> password ) {
+string CryptSetup::openVolume ( string dev, SecureMem<char> password ) {
     int ret = 1;
     list<string> args;
-    list<crypto::SecureMem<char> > stdout;
+    list<SecureMem<char> > stdout;
     string stdin;
 
     try {
@@ -78,7 +79,7 @@ string CryptSetup::openVolume ( string dev, crypto::SecureMem<char> password ) {
 void CryptSetup::closeVolume ( string dev ) {
     list<string> args;
     string stdin;
-    list<crypto::SecureMem<char> > stdout;
+    list<SecureMem<char> > stdout;
     int ret = 1;
 
     if ( !this->isAvailable() ) {
@@ -107,12 +108,12 @@ void CryptSetup::closeVolume ( string dev ) {
     }
 }
 
-void CryptSetup::createVolume ( string dev, crypto::SecureMem<char> password, bool force,
+void CryptSetup::createVolume ( string dev, SecureMem<char> password, bool force,
                                 Cipher c, Mode m, Hash h, KeySize k, Entropy e ) {
     list<string> args;
     stringstream ss;
     string stdin;
-    list<crypto::SecureMem<char> > stdout;
+    list<SecureMem<char> > stdout;
     int ret = 1;
 
     if ( !this->isAvailable() ) {
@@ -148,9 +149,9 @@ void CryptSetup::createVolume ( string dev, crypto::SecureMem<char> password, bo
     }
 }
 
-void CryptSetup::changeVolume ( string dev, crypto::SecureMem<char> password, crypto::SecureMem<char> newPassword ) {
+void CryptSetup::changeVolume ( string dev, SecureMem<char> password, SecureMem<char> newPassword ) {
     list<string> args;
-    list<crypto::SecureMem<char> > stdout;
+    list<SecureMem<char> > stdout;
     int ret = 1;
     string stdin;
 
@@ -181,7 +182,7 @@ void CryptSetup::changeVolume ( string dev, crypto::SecureMem<char> password, cr
 
 bool CryptSetup::isTool ( string dev ) {
     list<string> args;
-    list<crypto::SecureMem<char> > stdout;
+    list<SecureMem<char> > stdout;
     string stdin;
     int ret = 1;
 
@@ -195,7 +196,7 @@ bool CryptSetup::isTool ( string dev ) {
 
 bool CryptSetup::isAvailable ( ) {
     list<string> args;
-    list<crypto::SecureMem<char> > stdout;
+    list<SecureMem<char> > stdout;
     string stdin;
     int ret = 1;
 

@@ -1,4 +1,4 @@
-#include "CryptoBackend.h"
+#include <crypto/CryptoBackend.h>
 #include <random>
 #include <botan/botan.h>
 #include <botan/secmem.h>
@@ -6,6 +6,7 @@
 using namespace std;
 using namespace crypto;
 using namespace Botan;
+using namespace utils;
 
 const static string KEY_DERIVATION = "PBKDF2(SHA-256)";
 const static string ALGORITHM = "AES-256/CBC";

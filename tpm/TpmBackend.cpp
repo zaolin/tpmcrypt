@@ -15,12 +15,13 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "TpmBackend.h"
+#include <tpm/TpmBackend.h>
 
 #include <iomanip>
 
 using namespace std;
 using namespace tpm;
+using namespace utils;
 
 TpmBackend::TpmBackend ( ) :
 hContext ( ),
@@ -67,7 +68,7 @@ void TpmBackend::preCalculatePcr ( ) {
 
 }
 
-string TpmBackend::sealBackup ( crypto::SecureMem<char> toSeal, crypto::SecureMem<char> password ) {
+string TpmBackend::sealBackup ( SecureMem<char> toSeal, SecureMem<char> password ) {
     unsigned loc = 0;
     string emptyPcr = "0000000000000000000000000000000000000000";
 
@@ -210,7 +211,7 @@ TpmManufactur TpmBackend::getTpmManufactur ( ) {
     }
 }
 
-void TpmBackend::changeOwnerPassword ( crypto::SecureMem<char> ownerPasswordOld, crypto::SecureMem<char> ownerPasswordNew ) {
+void TpmBackend::changeOwnerPassword ( SecureMem<char> ownerPasswordOld, SecureMem<char> ownerPasswordNew ) {
     TSS_RESULT err;
     TSS_HPOLICY hTpmPolicy;
     TSS_HPOLICY hNewPolicy;
@@ -263,7 +264,7 @@ void TpmBackend::changeOwnerPassword ( crypto::SecureMem<char> ownerPasswordOld,
     }
 }
 
-void TpmBackend::changeSrkPassword ( crypto::SecureMem<char> srkPasswordOld, crypto::SecureMem<char> srkPasswordNew ) {
+void TpmBackend::changeSrkPassword ( SecureMem<char> srkPasswordOld, SecureMem<char> srkPasswordNew ) {
     TSS_RESULT err;
     TSS_HKEY hSRK;
     TSS_HPOLICY hTpmPolicy;
@@ -323,7 +324,7 @@ void TpmBackend::changeSrkPassword ( crypto::SecureMem<char> srkPasswordOld, cry
     }
 }
 
-void TpmBackend::clear ( crypto::SecureMem<char> ownerPassword ) {
+void TpmBackend::clear ( SecureMem<char> ownerPassword ) {
     TSS_RESULT err;
     TSS_RESULT err2;
     TSS_HPOLICY hTpmPolicy;
@@ -375,7 +376,7 @@ void TpmBackend::clear ( crypto::SecureMem<char> ownerPassword ) {
     }
 }
 
-void TpmBackend::own ( crypto::SecureMem<char> ownerPassword, crypto::SecureMem<char> srkPassword ) {
+void TpmBackend::own ( SecureMem<char> ownerPassword, SecureMem<char> srkPassword ) {
     TSS_RESULT err;
     TSS_HKEY hSRK;
     TSS_HPOLICY hSrkPolicy;
@@ -437,7 +438,7 @@ void TpmBackend::own ( crypto::SecureMem<char> ownerPassword, crypto::SecureMem<
     }
 }
 
-string TpmBackend::seal ( crypto::SecureMem<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureMem<char> password ) {
+string TpmBackend::seal ( SecureMem<char> toSeal, int loc, std::vector<unsigned int> pcrs, SecureMem<char> password ) {
     TSS_HKEY hSRK;
     TSS_HENCDATA hEncData;
     TSS_UUID SRK_UUID = TSS_UUID_SRK;
@@ -556,7 +557,7 @@ string TpmBackend::seal ( crypto::SecureMem<char> toSeal, int loc, std::vector<u
     return encryptedData;
 }
 
-crypto::SecureMem<char> TpmBackend::unseal ( const std::string &toUnseal, crypto::SecureMem<char> password ) {
+SecureMem<char> TpmBackend::unseal ( const std::string &toUnseal, SecureMem<char> password ) {
     TSS_HKEY hSRK;
     TSS_HENCDATA hEncData;
     TSS_HPOLICY hPolicy;
@@ -617,10 +618,10 @@ crypto::SecureMem<char> TpmBackend::unseal ( const std::string &toUnseal, crypto
         cout << e.what() << endl;
     }
 
-    return crypto::SecureMem<char>(reinterpret_cast < char* > (plainData), plainLen);
+    return SecureMem<char>(reinterpret_cast < char* > (plainData), plainLen);
 }
 
-crypto::SecureMem<char> TpmBackend::getRandom ( size_t count ) {
+SecureMem<char> TpmBackend::getRandom ( size_t count ) {
     BYTE * random;
     TSS_RESULT err;
 
@@ -636,7 +637,7 @@ crypto::SecureMem<char> TpmBackend::getRandom ( size_t count ) {
         throw TpmBackendException("TPM Error: " + getException(err));
     }
 
-    return crypto::SecureMem<char>(reinterpret_cast < char* > (random), count);
+    return SecureMem<char>(reinterpret_cast < char* > (random), count);
 }
 
 string

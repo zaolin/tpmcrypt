@@ -21,20 +21,23 @@
 #include <cstdlib>
 #include <fstream>
 #include <unistd.h>
-#include "AuthenticationProtocol.h"
-#include "KeyFile.h"
-#include "CryptSetup.h"
-#include "TpmBackend.h"
-#include "CryptoBackend.h"
+#include <protocol/AuthenticationProtocol.h>
+#include <utils/KeyFile.h>
+#include <tools/CryptSetup.h>
+#include <tpm/TpmBackend.h>
+#include <tpm/TpmStateMachine.h>
+#include <crypto/CryptoBackend.h>
 
 using namespace std;
 using namespace crypto;
 using namespace tools;
 using namespace tpm;
+using namespace utils;
+using namespace protocol;
 
 int
 main ( int argc, char** argv ) {
-
+/*
     CryptSetup tool;
     KeyFile file("keyfile.vol");
     vector<unsigned> pcrs;
@@ -53,13 +56,14 @@ main ( int argc, char** argv ) {
     string encrypted1 = TpmBackend().seal(secpw, 0, pcrs, dummy);
     string encrypted2 = TpmBackend().seal(secmonce, 0, pcrs, dummy);
 
-    tools::Volume vol("foo", "/dev/loop0", encrypted1, CryptSetup::TAG, encrypted2);
+    Volume vol("foo", "/dev/loop0", encrypted1, CryptSetup::TAG, encrypted2);
 
     file.add(vol);
 
     tool.createVolume("/dev/loop0", secpw, true, AES, CBC, SHA1, S256, RANDOM);
     AuthenticationProtocol foo(vol);
-
+*/
+    TpmStateMachine();
     return 0;
 }
 

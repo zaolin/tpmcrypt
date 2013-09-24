@@ -19,7 +19,7 @@
 #define	CRYPTSETUP_H
 
 #include <iostream>
-#include "ToolBackend.h"
+#include <tools/ToolBackend.h>
 
 namespace tools {
 
@@ -29,12 +29,12 @@ namespace tools {
 
         ~CryptSetup();
 
-        std::string openVolume(std::string dev, crypto::SecureMem<char> password);
+        std::string openVolume(std::string dev, utils::SecureMem<char> password);
         void closeVolume(std::string dev);
-        void createVolume(std::string dev, crypto::SecureMem<char> password,
+        void createVolume(std::string dev, utils::SecureMem<char> password,
                 bool force, Cipher c, Mode m,
                 Hash h, KeySize k, Entropy e);
-        void changeVolume(std::string dev, crypto::SecureMem<char> password, crypto::SecureMem<char> newPassword);
+        void changeVolume(std::string dev, utils::SecureMem<char> password, utils::SecureMem<char> newPassword);
 
     private:
         std::string getCipher(Cipher c);

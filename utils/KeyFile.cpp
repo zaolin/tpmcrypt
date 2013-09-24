@@ -19,10 +19,10 @@
 #include <sstream>
 #include <cstring>
 #include <string>
-#include "KeyFile.h"
+#include <utils/KeyFile.h>
 #include <unistd.h>
 
-using namespace tools;
+using namespace utils;
 using namespace std;
 
 const static string BEGIN = "-----BEGIN VOLUME-----";

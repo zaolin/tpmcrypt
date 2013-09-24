@@ -30,7 +30,7 @@
 #include <trousers/trousers.h>
 #include <string.h>
 
-#include "SecureMem.h"
+#include <utils/SecureMem.h>
 
 #define TSS_ERROR_CODE(x)       (x & 0xFFF)
 #define TSS_ERROR_LAYER(x)      (x & 0x3000)
@@ -89,19 +89,19 @@ namespace tpm {
         TpmBackend();
         ~TpmBackend();
 
-        void changeSrkPassword(crypto::SecureMem<char> srkPasswordOld, crypto::SecureMem<char> srkPasswordNew);
-        void changeOwnerPassword(crypto::SecureMem<char> ownerPasswordOld, crypto::SecureMem<char> ownerPasswordNew);
+        void changeSrkPassword(utils::SecureMem<char> srkPasswordOld, utils::SecureMem<char> srkPasswordNew);
+        void changeOwnerPassword(utils::SecureMem<char> ownerPasswordOld, utils::SecureMem<char> ownerPasswordNew);
         void preCalculatePcr();
-        std::string sealBackup(crypto::SecureMem<char> toSeal, crypto::SecureMem<char> password);
+        std::string sealBackup(utils::SecureMem<char> toSeal, utils::SecureMem<char> password);
         std::map<unsigned, std::pair<std::string, std::string> > readPcrs();
         unsigned getPcrSize();
         TpmGlobalState getState();
         TpmManufactur getTpmManufactur();
-        void clear(crypto::SecureMem<char> ownerPassword);
-        void own(crypto::SecureMem<char> ownerPassword, crypto::SecureMem<char> srkPassword);
-        std::string seal(crypto::SecureMem<char> toSeal, int loc, std::vector<unsigned int> pcrs, crypto::SecureMem<char> password);
-        crypto::SecureMem<char> unseal(const std::string &toUnseal, crypto::SecureMem<char> password);
-        crypto::SecureMem<char> getRandom(size_t count);
+        void clear(utils::SecureMem<char> ownerPassword);
+        void own(utils::SecureMem<char> ownerPassword, utils::SecureMem<char> srkPassword);
+        std::string seal(utils::SecureMem<char> toSeal, int loc, std::vector<unsigned int> pcrs, utils::SecureMem<char> password);
+        utils::SecureMem<char> unseal(const std::string &toUnseal, utils::SecureMem<char> password);
+        utils::SecureMem<char> getRandom(size_t count);
 
     private:
 

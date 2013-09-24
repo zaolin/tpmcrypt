@@ -15,22 +15,11 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AUTHENTICATIONPROTOCOL_H
-#define	AUTHENTICATIONPROTOCOL_H
+#include <utils/CommandLine.h>
 
-#include <iostream>
-#include "Volume.h"
+using namespace std;
+using namespace utils;
 
-namespace crypto {
-
-    class AuthenticationProtocol {
-    public:
-        AuthenticationProtocol(tools::Volume volume);
-        ~AuthenticationProtocol();
-
-    };
+void CommandLine::run(int argc, char **argv) {
+	
 }
-
-
-#endif	/* AUTHENTICATIONPROTOCOL_H */
-

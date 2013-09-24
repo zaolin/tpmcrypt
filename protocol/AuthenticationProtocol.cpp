@@ -15,17 +15,19 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AuthenticationProtocol.h"
-#include "KeyFile.h"
-#include "Volume.h"
-#include "CryptSetup.h"
-#include "CryptoBackend.h"
-#include "TpmBackend.h"
+#include <protocol/AuthenticationProtocol.h>
+#include <utils/KeyFile.h>
+#include <utils/Volume.h>
+#include <tools/CryptSetup.h>
+#include <crypto/CryptoBackend.h>
+#include <tpm/TpmBackend.h>
 
 using namespace std;
 using namespace crypto;
 using namespace tools;
 using namespace tpm;
+using namespace utils;
+using namespace protocol;
 
 /*
  * 1. Unseal monce

@@ -23,8 +23,9 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <botan/botan.h>
+#include <stdexcept>
 
-namespace crypto {
+namespace utils {
     
     class SecureMemException : public std::runtime_error {
     public:

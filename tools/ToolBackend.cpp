@@ -15,7 +15,7 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ToolBackend.h"
+#include <tools/ToolBackend.h>
 #include <stdio.h>
 #include <sstream>
 #include <err.h>
@@ -29,6 +29,7 @@
 #include <cassert>
 #include <blkid/blkid.h>
 
+using namespace utils;
 using namespace tools;
 using namespace std;
 
@@ -40,7 +41,7 @@ ToolBackend::~ToolBackend ( ) {
 
 }
 
-void ToolBackend::call ( string executable, list<string> commands, list<crypto::SecureMem<char> > toWrite, string &toRead, int *ret ) {
+void ToolBackend::call ( string executable, list<string> commands, list<SecureMem<char> > toWrite, string &toRead, int *ret ) {
     char buf[255];
     char* args[255];
     char* envp[2];
@@ -66,8 +67,9 @@ void ToolBackend::call ( string executable, list<string> commands, list<crypto::
     envp[0] = strdup(("PATH=" + string(getenv("PATH"))).c_str());
     envp[1] = 0;
 
-    pipe(out);
-    pipe(in);
+    if(pipe(out) < 0 || pipe(in) < 0 ) {
+    
+    }
 
     posix_spawn_file_actions_init(&action);
     posix_spawn_file_actions_adddup2(&action, out[0], 0);
@@ -81,9 +83,14 @@ void ToolBackend::call ( string executable, list<string> commands, list<crypto::
     close(out[0]);
     close(in[1]);
 
-    for ( list<crypto::SecureMem<char> >::iterator it = toWrite.begin(); it != toWrite.end(); it++ ) {
-        write(out[1], it->getPointer(), it->getLen());
-        write(out[1], "\n", 1);
+    for ( list<SecureMem<char> >::iterator it = toWrite.begin(); it != toWrite.end(); it++ ) {
+        if(write(out[1], it->getPointer(), it->getLen() != it->getLen()))  {
+	
+	}
+        
+	if(write(out[1], "\n", 1) != 1) {
+
+	}
     }
 
     close(out[1]);

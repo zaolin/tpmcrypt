@@ -15,26 +15,16 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CRYPTOBACKEND_H
-#define	CRYPTOBACKEND_H
+#include <utils/Logging.h>
 
-#include <iostream>
-#include <string.h>
-#include <stdexcept>
-#include <unistd.h>
-#include <sstream>
+using namespace std;
+using namespace utils;
 
-#include "SecureMem.h"
-
-namespace crypto {
-
-    class CryptoBackend {
-    public:
-        SecureMem<char>
-        getPassword(const char *promt);
-
-        std::string
-        generateRandomString(size_t count, bool allAscii);
-    };
+Logging::Logging(int level, const string &message) {
+	openlog( NULL, LOG_PERROR | LOG_PID, LOG_SYSLOG );
+	syslog(level, "%s", message.c_str());
 }
-#endif
+
+Logging::~Logging() {
+	closelog();
+}

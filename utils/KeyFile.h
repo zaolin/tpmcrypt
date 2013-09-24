@@ -21,9 +21,9 @@
 #include <iostream>
 #include <fstream>
 #include <list>
-#include "Volume.h"
+#include <utils/Volume.h>
 
-namespace tools {
+namespace utils {
 
     class KeyFile {
     public:
