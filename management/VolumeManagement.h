@@ -19,16 +19,13 @@
 #define	VOLUMEMANAGEMENT_H
 
 #include <iostream>
+#include <management/Management.h>
 
 namespace management {
 
-    class VolumeManagement {
+    class VolumeManagement : public Management {
     public:
-        
-        VolumeManagement();
-        ~VolumeManagement();
-        
-        
+       void start() { } 
     };
 }
 

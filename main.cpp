@@ -27,7 +27,10 @@
 #include <tpm/TpmBackend.h>
 #include <tpm/TpmStateMachine.h>
 #include <crypto/CryptoBackend.h>
+#include <utils/CommandLine.h>
+#include <management/VolumeManagement.h>
 
+using namespace management;
 using namespace std;
 using namespace crypto;
 using namespace tools;
@@ -37,6 +40,7 @@ using namespace protocol;
 
 int
 main ( int argc, char** argv ) {
+    //CommandLine().registerOption<VolumeManagement>("--help", 'h', 1);
 /*
     CryptSetup tool;
     KeyFile file("keyfile.vol");

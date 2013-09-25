@@ -15,6 +15,9 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef COMMANDLINE_H
+#define COMMANDLINE_H
+
 #include <iostream>
 #include <map>
 #include <getopt.h>
@@ -38,14 +41,15 @@ class CommandLine {
 			newOption.flag = NULL;
 			newOption.val = (int)shortName;
 			
-			//matrix.insert(std::pair<struct option, std::function<void(Management&)> >(newOption , &T::start));
+			matrix.insert(std::pair<struct option, std::function<void(management::Management&)> >(newOption , &T::start));
 		}
 		
 		void run(int argc, char **argv);
 		
 	private:
 		
-		//std::map<struct option, std::function<void(const Management&)> > matrix;
+		std::map<struct option, std::function<void(management::Management&)> > matrix;
 };
 
 }
+#endif

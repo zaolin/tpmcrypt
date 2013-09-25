@@ -21,5 +21,10 @@ using namespace std;
 using namespace utils;
 
 void CommandLine::run(int argc, char **argv) {
-	
+	struct option long_options[matrix.size()];
+
+	for(map<struct option, std::function<void(management::Management&)> >::iterator it = matrix.begin(); it != matrix.end(); ++it) {
+	}	
+
+	//getopt_long(argc, argv, "abc:d:012", long_options, &option_index);	
 }
