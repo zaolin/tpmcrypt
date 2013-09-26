@@ -16,15 +16,46 @@
  */
 
 #include <utils/CommandLine.h>
+#include <string.h>
 
 using namespace std;
 using namespace utils;
 
 void CommandLine::run(int argc, char **argv) {
-	struct option long_options[matrix.size()];
+	int counter = 0;
+	int option_index;
+	struct option long_options[optionMap.size()];
+	
+	for(map<string, map<struct option *, std::function<void(void)> > >::iterator optionPair = optionMap.begin(); optionPair != optionMap.end(); ++optionPair) {	
+		for(map<struct option *, std::function<void(void)> >::iterator it = optionPair->second.begin(); it != optionPair->second.end(); ++it) {
+			long_options[counter++] = *it->first;
+		}
+	}
+	
+	while(1) {
+		int c = getopt_long(argc, argv, "h", long_options, &option_index);
 
-	for(map<struct option, std::function<void(management::Management&)> >::iterator it = matrix.begin(); it != matrix.end(); ++it) {
-	}	
+		if(c == -1)
+			break;
+		
+	}
+}
 
-	//getopt_long(argc, argv, "abc:d:012", long_options, &option_index);	
+void CommandLine::prepareOption(std::string name, char value, Argument arg, std::function<void(void)> function) {
+	struct option *newOption;
+        std::map<struct option *, std::function<void(void)> > table;
+                        
+        newOption = (struct option*)malloc(sizeof(struct option));
+        char *newName = new char[name.length()];
+
+	strncpy(newName, name.c_str(), name.length());
+	
+	newOption->name = newName;
+        newOption->has_arg = static_cast<int>(arg);
+        newOption->flag = NULL;
+
+       	newOption->val = (int)value;
+
+	table.insert(std::pair<struct option *, std::function<void(void)> >(newOption , function));
+        optionMap.insert(std::pair<std::string, std::map<struct option *, std::function<void(void)> > >(name, table));
 }

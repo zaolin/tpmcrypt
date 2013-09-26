@@ -38,9 +38,16 @@ using namespace tpm;
 using namespace utils;
 using namespace protocol;
 
+void foo() { }
+
 int
 main ( int argc, char** argv ) {
-    //CommandLine().registerOption<VolumeManagement>("--help", 'h', 1);
+    CommandLine cmdParser;
+
+    cmdParser.registerOptionClass<VolumeManagement>("help", 'h', CommandLine::NONE);
+    cmdParser.registerOptionFunction(foo, "foo");    
+
+    cmdParser.run(argc, argv);
 /*
     CryptSetup tool;
     KeyFile file("keyfile.vol");

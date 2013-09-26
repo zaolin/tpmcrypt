@@ -21,34 +21,42 @@
 #include <iostream>
 #include <map>
 #include <getopt.h>
-#include <string.h>
-#include <management/Management.h>
 #include <functional>
 
 namespace utils {
 
 class CommandLine {	
 	public:
+		enum Argument {
+			NONE,
+			REQUIRED,
+			OPTIONAL
+		};
+	
+		CommandLine() :
+		optionMap() {
+
+		}
+
+		~CommandLine() { }
 		
-		template<class T>
-		void registerOption(std::string longName, char shortName, int argument) {
-			struct option newOption;
-			
-			newOption.name = new char[longName.length()];
-			//strncpy(newOption.name, longName.c_str(), longName.length());
-			
-			newOption.has_arg = argument;
-			newOption.flag = NULL;
-			newOption.val = (int)shortName;
-			
-			matrix.insert(std::pair<struct option, std::function<void(management::Management&)> >(newOption , &T::start));
+		template<typename T>
+		void registerOptionClass(std::string name, char value = '\0', Argument arg = NONE) {
+			T *t = new T();
+
+			prepareOption(name, value, arg, std::bind(&T::start, t));
+		}
+		
+		void registerOptionFunction(std::function<void(void)> function, std::string name, char value = '\0', Argument arg = NONE) {
+			prepareOption(name, value, arg, function);
 		}
 		
 		void run(int argc, char **argv);
 		
 	private:
+		void prepareOption(std::string name, char value, Argument arg, std::function<void(void)> function);
 		
-		std::map<struct option, std::function<void(management::Management&)> > matrix;
+		std::multimap<std::string, std::map<struct option *, std::function<void(void)> > > optionMap;
 };
 
 }

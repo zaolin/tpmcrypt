@@ -6,11 +6,11 @@ CPPFLAGS=-O2 -ggdb -Wall -pedantic -Weffc++ -std=c++11 -Wextra \
 LD=g++
 LDFLAGS=-ltspi -lblkid -z relro -z now
 
-bin/tpmcrypt: $(patsubst %.cpp,%.o,$(wildcard */*.cpp *.cpp))
+bin/tpmcrypt-console: $(patsubst %.cpp,%.o,$(wildcard */*.cpp console.cpp))
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 %.o: %.cpp $(wildcard */*.h)
 	$(CPP) $(CPPFLAGS) -c -o $@ $<
 
 clean: 
-	rm -f $(wildcard */*.o *.o) bin/tpmcrypt
+	rm -f $(wildcard */*.o *.o) bin/*

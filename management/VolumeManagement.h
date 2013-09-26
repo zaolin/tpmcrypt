@@ -25,7 +25,7 @@ namespace management {
 
     class VolumeManagement : public Management {
     public:
-       void start() { } 
+       void start() { std::cout << "foo" << std::endl; } 
     };
 }
 
