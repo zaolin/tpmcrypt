@@ -82,6 +82,36 @@ namespace tpm {
         T11,
         T10
     };
+    
+    static struct {
+        unsigned pcr;
+        std::string description;
+    } PlatformConfigurationRegisters[] = {
+        { 0, "S-CRTM and POST data" },
+        { 1, "POST BIOS, NVRAM, CMOS, SMBIOS and Platform Config flags data" },
+        { 2, "Option ROM data" },
+        { 3, "Option ROM configuration data" },
+        { 4, "IPL, Boot Device Used, Calling INT and MBR data" },
+        { 5, "IPL Configuration data" },
+        { 6, "State Transitions and Wake events data" },
+        { 7, "Host Platform Manufactur data" },
+        { 8, "Trusted Grub Legacy Stage 1.5 data" },
+        { 9, "Trusted Grub Legacy Stage 2 data" },
+        { 10, "Integrity Measurement Architecture data" },
+        { 11, "Reserved" },
+        { 12, "Trusted Grub Legacy menu.lst data" },
+        { 13, "Trusted Grub Legacy checkfile data" },
+        { 14, "Trusted Grub Linux Kernel and Initramfs data" },
+        { 15, "Reserved" },
+        { 16, "Debug" },
+        { 17, "Intel TXT (DRTM: LCP Policy, BIOS ACM, STM, MLE, S-CRTM state data)" },
+        { 18, "Intel TXT (DRTM: ACM pubkey and LCP Hash data)" },
+        { 19, "Intel TXT (TBOOT: LCP and grub modules data)" },
+        { 20, "Intel TXT Reserved" },
+        { 21, "Intel TXT Reserved" },
+        { 22, "Intel TXT Reserved" },
+        { 23, "Debug" },
+    };
 
     class TpmBackend {
     public:

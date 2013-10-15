@@ -17,45 +17,78 @@
 
 #include <utils/CommandLine.h>
 #include <string.h>
+#include <sstream>
 
 using namespace std;
 using namespace utils;
 
-void CommandLine::run(int argc, char **argv) {
+void CommandLine::run(int argc, char **argv)
+{
 	int counter = 0;
 	int option_index;
-	struct option long_options[optionMap.size()];
+	struct option long_options[optionMap.size() + 1];
+	stringstream shortOptions;
 	
-	for(map<string, map<struct option *, std::function<void(void)> > >::iterator optionPair = optionMap.begin(); optionPair != optionMap.end(); ++optionPair) {	
-		for(map<struct option *, std::function<void(void)> >::iterator it = optionPair->second.begin(); it != optionPair->second.end(); ++it) {
-			long_options[counter++] = *it->first;
+	if(argc < 2) {
+		for (multimap<string, Option>::iterator it = optionMap.begin(); it != optionMap.end(); ++it) {
+				cout << "	" << "--" << it->second.commandLineOption->name << "	" << it->first << endl;
 		}
+		
+		return;
+	}
+
+	for (multimap<string, Option>::iterator it = optionMap.begin(); it != optionMap.end(); ++it) {
+		long_options[counter++] = *it->second.commandLineOption;
+		shortOptions << (char)it->second.commandLineOption->val;
 	}
 	
-	while(1) {
-		int c = getopt_long(argc, argv, "h", long_options, &option_index);
+	long_options[counter] = {0, 0, 0, 0};
 
-		if(c == -1)
+	while (1) {
+		multimap<string, CommandLine::Option>::iterator it;
+
+		int c = getopt_long(argc, argv, shortOptions.str().c_str(), long_options, &option_index);
+
+		if (c == -1)
 			break;
-		
+	
+		switch (c) {
+		case '?': 
+			break;
+
+		default:
+			it = findOption(long_options[option_index].name);
+			if(it != optionMap.end())
+				it->second.memberFunction();
+			
+			break;
+		}
 	}
 }
 
-void CommandLine::prepareOption(std::string name, char value, Argument arg, std::function<void(void)> function) {
+void CommandLine::prepareOption(std::string desc, std::string name, char value, Argument arg, std::function<void(void) > function, std::function<void(void) > destructor)
+{
 	struct option *newOption;
-        std::map<struct option *, std::function<void(void)> > table;
-                        
-        newOption = (struct option*)malloc(sizeof(struct option));
-        char *newName = new char[name.length()];
+
+	newOption = (struct option*) malloc(sizeof(struct option));
+	char *newName = new char[name.length()];
 
 	strncpy(newName, name.c_str(), name.length());
-	
+
 	newOption->name = newName;
-        newOption->has_arg = static_cast<int>(arg);
-        newOption->flag = NULL;
+	newOption->has_arg = static_cast<int> (arg);
+	newOption->flag = NULL;
+	newOption->val = (int) value;
 
-       	newOption->val = (int)value;
+	optionMap.insert(std::make_pair(desc, Option(newOption, function, destructor)));
+}
 
-	table.insert(std::pair<struct option *, std::function<void(void)> >(newOption , function));
-        optionMap.insert(std::pair<std::string, std::map<struct option *, std::function<void(void)> > >(name, table));
+multimap<string, CommandLine::Option>::iterator CommandLine::findOption(const char *longName)
+{
+	for (multimap<string, Option>::iterator it = optionMap.begin(); it != optionMap.end(); ++it) {
+		if (strncasecmp(longName, it->second.commandLineOption->name, strlen(it->second.commandLineOption->name)) == 0)
+			return it;
+	}
+
+	return optionMap.end();
 }

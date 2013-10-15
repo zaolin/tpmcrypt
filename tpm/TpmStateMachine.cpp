@@ -79,7 +79,4 @@ void TpmStateMachine::needOwnership() {
 
 void TpmStateMachine::needReboot() {
 	Logging(LOG_INFO, "Restarting the system !");
-
-	sync();
-	reboot(LINUX_REBOOT_CMD_RESTART);
 }

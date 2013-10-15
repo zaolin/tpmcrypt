@@ -111,7 +111,7 @@ map<unsigned, pair<string, string> > TpmBackend::readPcrs ( ) {
     map<unsigned, pair<string, string> > pcrs;
 
     for ( unsigned i = 0; i < tpmPcrSize; i++ ) {
-        pcrs.insert(make_pair(i, make_pair(this->readPcr(i), "")));
+        pcrs.insert(make_pair(i, make_pair(this->readPcr(i), PlatformConfigurationRegisters[i].description)));
     }
 
     return pcrs;

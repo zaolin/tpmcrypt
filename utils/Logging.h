@@ -24,11 +24,12 @@
 
 namespace utils {
 
-	class Logging {
-	public:
-		Logging(int level,const std::string &message);
-		~Logging();
+    class Logging {
+    public:
+        Logging(int level, const std::string &message);
+        Logging(int level, const std::string &message, const std::string &printMessage);
+        ~Logging();
 
-	};
+    };
 }
 #endif

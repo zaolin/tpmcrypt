@@ -25,6 +25,12 @@ Logging::Logging(int level, const string &message) {
 	syslog(level, "%s", message.c_str());
 }
 
+Logging::Logging(int level, const string &message, const std::string &printMessage) {
+        openlog( NULL, LOG_PID, LOG_SYSLOG );
+	syslog(level, "%s", message.c_str());
+	cout << printMessage << endl;
+}
+
 Logging::~Logging() {
 	closelog();
 }
