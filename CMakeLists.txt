@@ -50,6 +50,11 @@ find_library(tspi_LIBRARIES tspi)
 find_package_handle_standard_args(TROUSERS REQUIRED_VARS
 	tspi_LIBRARIES tspi_INCLUDE_DIRS)
 
+find_path(cryptopp_INCLUDE_DIRS crypto++/default.h)
+find_library(cryptopp_LIBRARIES crypto++)
+find_package_handle_standard_args(CRYPTOPP REQUIRED_VARS
+	cryptopp_LIBRARIES cryptopp_INCLUDE_DIRS)
+
 # C++11 flags
 if(CXXFLAG_CPP11)
 	add_definitions("-std=c++11")

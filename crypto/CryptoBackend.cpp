@@ -1,15 +1,18 @@
 #include <crypto/CryptoBackend.h>
 #include <random>
-#include <botan/botan.h>
-#include <botan/secmem.h>
+#include <crypto++/pwdbased.h>
+#include <crypto++/modes.h>
+#include <crypto++/aes.h>
+#include <crypto++/osrng.h>
+#include <crypto++/sha.h>
 
 using namespace std;
 using namespace crypto;
-using namespace Botan;
+using namespace CryptoPP;
 using namespace utils;
 
-const static string KEY_DERIVATION = "PBKDF2(SHA-256)";
-const static string ALGORITHM = "AES-256/CBC";
+const static unsigned DEFAULT_SALT_LEN = 16;
+const static unsigned DEFAULT_ITERATIONS_LEN = 2000;
 
 SecureMem<char>
 CryptoBackend::generateRandomString(size_t count, bool allAscii)
@@ -18,8 +21,8 @@ CryptoBackend::generateRandomString(size_t count, bool allAscii)
 	std::random_device rng;
 	std::uniform_int_distribution<int> dist(0, 255);
 	char byteRand;
-	char *random = (char*)calloc(count, sizeof(char));
-	
+	char *random = (char*) calloc(count, sizeof(char));
+
 	while (strlen(random) < count) {
 		byteRand = (char) dist(rng) % 128;
 
@@ -35,11 +38,11 @@ CryptoBackend::generateRandomString(size_t count, bool allAscii)
 	}
 	byteRand = (char) 0;
 	SecureMem<char> randomString(random, count);
-	
-	if(random != NULL) {
+
+	if (random != NULL) {
 		free(random);
 	}
-	
+
 	return randomString;
 }
 
@@ -57,6 +60,112 @@ CryptoBackend::getPassword(const char *promt)
 
 	return spassword;
 }
+
+/*
+byte*
+CryptoBackend::generateSalt()
+{
+	AutoSeededRandomPool rnd;
+	byte *salt = (byte*) malloc(DEFAULT_SALT_LEN * sizeof(byte));
+
+	if (salt == NULL) {
+
+	}
+
+	rnd.GenerateBlock(salt, DEFAULT_SALT_LEN);
+
+	return salt;
+}
+
+byte*
+CryptoBackend::generateIV()
+{
+	AutoSeededRandomPool rnd;
+	byte *iv = (byte*) malloc(AES::BLOCKSIZE * sizeof(byte));
+
+	if (iv == NULL) {
+
+	}
+
+	rnd.GenerateBlock(iv, AES::BLOCKSIZE);
+
+	return iv;
+}
+
+SecureMem<unsigned char>
+CryptoBackend::keyDerivation(SecureMem<unsigned char> passphrase, byte *salt)
+{
+	PKCS5_PBKDF2_HMAC<SHA256> pbkdf2;
+	byte key[AES::DEFAULT_KEYLENGTH];
+	unsigned result = 0;
+
+	result = pbkdf2.DeriveKey(key,
+		AES::DEFAULT_KEYLENGTH,
+		0,
+		passphrase.getPointer(),
+		passphrase.getLen(),
+		salt,
+		DEFAULT_SALT_LEN,
+		DEFAULT_ITERATIONS_LEN,
+		0);
+
+	if (result < 0) {
+
+	}
+
+	return SecureMem<unsigned char>(key, AES::DEFAULT_KEYLENGTH);
+}
+
+vector<string>
+CryptoBackend::initBlob(SecureMem<char> toEncrypt, SecureMem<char> passphrase)
+{
+	byte* iv, salt, encrypted;
+	vector<string> cryptoParams;
+	SecureMem<unsigned char> key;
+
+	iv = generateIV();
+	salt = generateSalt();
+
+	key = keyDerivation(passphrase, salt);
+
+	CFB_Mode<AES>::Encryption cfbEncryption(key.getPointer(), key.getLen(), iv);
+	cfbEncryption.ProcessData(encrypted, toEncrypt.getPointer(), toEncrypt.getLen());
+
+	cryptoParams.push_back(string(const_cast<const char*> (reinterpret_cast<char*> (encrypted))));
+	cryptoParams.push_back(string(const_cast<const char*> (reinterpret_cast<char*> (iv))));
+	cryptoParams.push_back(string(const_cast<const char*> (reinterpret_cast<char*> (salt))));
+
+	return cryptoParams;
+}
+
+SecureMem<unsigned char>
+CryptoBackend::decryptBlob(string toDecrypt, SecureMem<char> passphrase, string iv, string salt)
+{
+	byte *decrypted;
+	SecureMem<unsigned char> key;
+
+	key = keyDerivation(passphrase, salt);
+
+	CFB_Mode<AES>::Decryption cfbDecryption(key.getPointer(), key.getLen(), iv);
+	cfbDecryption.ProcessData(decrypted, static_cast<byte*> (toDecrypt.c_str()), toDecrypt.length());
+
+	return SecureMem<unsigned char>(decrypted, toDecrypt.length());
+}
+
+string
+CryptoBackend::encryptBlob(SecureMem<unsigned char> toEncrypt, SecureMem<char> passphrase, string iv, string salt)
+{
+	byte *encrypted;
+	SecureMem<unsigned char> key;
+
+	key = keyDerivation(passphrase, salt);
+	
+	CFB_Mode<AES>::Encryption cfbEncryption(key.getPointer(), key.getLen(), iv);
+	cfbEncryption.ProcessData(encrypted, toEncrypt.getPointer(), toEncrypt.getLen());
+
+	return string(const_cast<const char*> (reinterpret_cast<char*> (encrypted)));
+}
+ */
 /*
 std::string encrypt(SecureMem<char> password, 
 		    SecureMem<char> salt, 

@@ -46,13 +46,7 @@ void foo()
 int
 main(int argc, char** argv)
 {
-	TpmBackend tpm;
-
-	std::map<unsigned, std::pair<std::string, std::string> > foo = tpm.readPcrs();
-
-	for(std::map<unsigned, std::pair<std::string, std::string> >::iterator it = foo.begin(); it != foo.end(); ++it) {
-		cout << "PCR: " << it->first << "	0x" << it->second.first << "	" << it->second.second << endl;
-	}
+	TpmStateMachine tpmState;
 
 	//CommandLine cmdParser;
 	//TpmStateMachine tpmState;

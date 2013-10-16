@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include <utils/SecureMem.h>
+#include <crypto++/cryptlib.h>
 
 namespace crypto {
 
@@ -35,6 +36,20 @@ namespace crypto {
 
         utils::SecureMem<char>
         generateRandomString(size_t count, bool allAscii);
+        
+        //std::vector<std::string> initBlob(utils::SecureMem<char> toEncrypt, utils::SecureMem<char> passphrase);
+        //utils::SecureMem<unsigned char>decryptBlob(std::string toDecrypt, utils::SecureMem<char> passphrase, std::string iv, std::string salt);
+        //std::string encryptBlob(utils::SecureMem<unsigned char> toEncrypt, utils::SecureMem<char> passphrase, std::string iv, std::string salt);
+        
+    private:        
+        /*byte*
+        generateSalt();
+        
+        byte*
+        generateIV();
+        
+        utils::SecureMem<unsigned char>
+        keyDerivation(utils::SecureMem<unsigned char> passphrase, byte *salt);*/
     };
 }
 #endif
