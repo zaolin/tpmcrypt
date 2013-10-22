@@ -46,7 +46,19 @@ void foo()
 int
 main(int argc, char** argv)
 {
+        unsigned char tmp[] = "foo";
 	TpmStateMachine tpmState;
+        
+        SecureMem<unsigned char> password(tmp, 4);
+        SecureMem<unsigned char> toEncrypt(tmp, 4);
+        
+        vector<string> data = CryptoBackend().initBlob(toEncrypt, password);
+        SecureMem<unsigned char> foo = CryptoBackend().decryptBlob(data.at(0), password, data.at(1), data.at(2));
+        
+        cout << "encrypted" << data.at(0) << endl;
+        cout << "iv" << data.at(1) << endl;
+        cout << "salt" << data.at(2) << endl;
+        cout << "unecrypted" << foo.getAsUnsecureString() << endl;
 
 	//CommandLine cmdParser;
 	//TpmStateMachine tpmState;

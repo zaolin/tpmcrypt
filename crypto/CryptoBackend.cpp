@@ -11,7 +11,7 @@ using namespace crypto;
 using namespace CryptoPP;
 using namespace utils;
 
-const static unsigned DEFAULT_SALT_LEN = 16;
+const static unsigned DEFAULT_SALT_LEN = 32;
 const static unsigned DEFAULT_ITERATIONS_LEN = 2000;
 
 SecureMem<char>
@@ -61,12 +61,11 @@ CryptoBackend::getPassword(const char *promt)
 	return spassword;
 }
 
-/*
 byte*
 CryptoBackend::generateSalt()
 {
 	AutoSeededRandomPool rnd;
-	byte *salt = (byte*) malloc(DEFAULT_SALT_LEN * sizeof(byte));
+	byte *salt = (byte*) calloc(DEFAULT_SALT_LEN, sizeof(byte));
 
 	if (salt == NULL) {
 
@@ -81,7 +80,7 @@ byte*
 CryptoBackend::generateIV()
 {
 	AutoSeededRandomPool rnd;
-	byte *iv = (byte*) malloc(AES::BLOCKSIZE * sizeof(byte));
+	byte *iv = (byte*) calloc(AES::BLOCKSIZE, sizeof(byte));
 
 	if (iv == NULL) {
 
@@ -117,11 +116,13 @@ CryptoBackend::keyDerivation(SecureMem<unsigned char> passphrase, byte *salt)
 }
 
 vector<string>
-CryptoBackend::initBlob(SecureMem<char> toEncrypt, SecureMem<char> passphrase)
+CryptoBackend::initBlob(SecureMem<unsigned char> toEncrypt, SecureMem<unsigned char> passphrase)
 {
-	byte* iv, salt, encrypted;
+	byte *iv = NULL, *salt = NULL, *encrypted = NULL;
 	vector<string> cryptoParams;
 	SecureMem<unsigned char> key;
+        
+        encrypted = (byte*) malloc(sizeof(byte)*toEncrypt.getLen());
 
 	iv = generateIV();
 	salt = generateSalt();
@@ -134,69 +135,42 @@ CryptoBackend::initBlob(SecureMem<char> toEncrypt, SecureMem<char> passphrase)
 	cryptoParams.push_back(string(const_cast<const char*> (reinterpret_cast<char*> (encrypted))));
 	cryptoParams.push_back(string(const_cast<const char*> (reinterpret_cast<char*> (iv))));
 	cryptoParams.push_back(string(const_cast<const char*> (reinterpret_cast<char*> (salt))));
+        
+        free(encrypted);
 
 	return cryptoParams;
 }
 
 SecureMem<unsigned char>
-CryptoBackend::decryptBlob(string toDecrypt, SecureMem<char> passphrase, string iv, string salt)
+CryptoBackend::decryptBlob(string toDecrypt, SecureMem<unsigned char> passphrase, string iv, string salt)
 {
-	byte *decrypted;
+	byte *decrypted = NULL;
 	SecureMem<unsigned char> key;
+        
+        decrypted = (byte*)malloc(sizeof(byte)*toDecrypt.length());
 
-	key = keyDerivation(passphrase, salt);
+	key = keyDerivation(passphrase, reinterpret_cast<byte*> (const_cast<char*>(salt.c_str())));
 
-	CFB_Mode<AES>::Decryption cfbDecryption(key.getPointer(), key.getLen(), iv);
-	cfbDecryption.ProcessData(decrypted, static_cast<byte*> (toDecrypt.c_str()), toDecrypt.length());
-
-	return SecureMem<unsigned char>(decrypted, toDecrypt.length());
+	CFB_Mode<AES>::Decryption cfbDecryption(key.getPointer(), key.getLen(), reinterpret_cast<byte*> (const_cast<char*>(iv.c_str())));
+	cfbDecryption.ProcessData(decrypted, reinterpret_cast<const byte*> (toDecrypt.c_str()), toDecrypt.length());
+        
+        SecureMem<unsigned char> blob(decrypted, toDecrypt.length());
+        
+        free(decrypted);
+        
+	return blob;
 }
 
 string
-CryptoBackend::encryptBlob(SecureMem<unsigned char> toEncrypt, SecureMem<char> passphrase, string iv, string salt)
+CryptoBackend::encryptBlob(SecureMem<unsigned char> toEncrypt, SecureMem<unsigned char> passphrase, string iv, string salt)
 {
-	byte *encrypted;
+	byte *encrypted = NULL;
 	SecureMem<unsigned char> key;
 
-	key = keyDerivation(passphrase, salt);
+	key = keyDerivation(passphrase, reinterpret_cast<byte*> (const_cast<char*>(salt.c_str())));
 	
-	CFB_Mode<AES>::Encryption cfbEncryption(key.getPointer(), key.getLen(), iv);
+	CFB_Mode<AES>::Encryption cfbEncryption(key.getPointer(), key.getLen(), reinterpret_cast<const byte*> (iv.c_str()));
 	cfbEncryption.ProcessData(encrypted, toEncrypt.getPointer(), toEncrypt.getLen());
 
 	return string(const_cast<const char*> (reinterpret_cast<char*> (encrypted)));
 }
- */
-/*
-std::string encrypt(SecureMem<char> password, 
-		    SecureMem<char> salt, 
-		    SecureMem<char> iv, 
-		    unsigned iterations, 
-		    SecureMem<char> toEncrypt)
-{
-	PBKDF* pbkdf = NULL;
-	OctetString aesKey;
-	InitializationVector initialisation_vector(iv);
-	
-	pbkdf = get_pbkdf(KEY_DERIVATION);
-	aesKey = pbkdf->derive_key(32, password.getString(), &salt[0], salt.size(), iterations);
-	SymmetricKey key(aesKey.as_string());
-        
-	Pipe pipe(get_cipher(ALGORITHM, key, iv, ENCRYPTION));
-	pipe.process_msg(toEncrypt);
-	return pipe.read_all_as_string();
-}
-
-SecureMem<char> decrypt()
-{
-	PBKDF* pbkdf = get_pbkdf(KEY_DERIVATION);
-	AutoSeeded_RNG rng;
-	AutoSeeded_RNG rng2;
-	secure_vector<byte> salt = rng.random_vec(16);
-	OctetString aes256_key = pbkdf->derive_key(32, "password", &salt[0], salt.size(), 10000);
-	SymmetricKey key(aes256_key.as_string()); // a random 128-bit key         
-	InitializationVector iv(rng2, 16); // a random 128-bit IV          
-	Pipe pipe(get_cipher(ALGORITHM, key, iv, DECRYPTION));
-	pipe.process_msg("secrets");
-	return pipe.read_all_as_string();
-}
- */
