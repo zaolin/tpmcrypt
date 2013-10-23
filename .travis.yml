@@ -3,7 +3,7 @@ before_install:
 install:
   - sudo apt-get install trousers libtspi-dev
   - sudo apt-get install cmake 
-  - sudo apt-get install libcrypto++ libcrypto++-dbg libcrypto++-dev
+  - sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
   - sudo apt-get install libblkid-dev
 language: cpp
 script: make
