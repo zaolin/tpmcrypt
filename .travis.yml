@@ -12,10 +12,7 @@ before_install:
   - sudo apt-get update
 install:
   - sudo apt-get install clang-3.4
-  - sudo apt-get install
   - sudo apt-get install libgmp3-dev
-  - sudo apt-get install linux-source
-  - sudo apt-get install build-essential
   - sudo apt-get install trousers libtspi-dev
   - sudo apt-get install cmake
   - sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
