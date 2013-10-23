@@ -1,4 +1,4 @@
-#TpmCrypt
+# ![alt text](https://raw.github.com/zaolin/tpmcrypt/devel/logo.png "Logo Title Text 1") TpmCrypt
 
 A disk encryption tool based on Trusted Computing for Linux.
 This tool can utilize the tpm to bind the volume encryption key to the platform state.
