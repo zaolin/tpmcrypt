@@ -10,7 +10,9 @@ before_install:
   - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
   - sudo add-apt-repository "deb http://llvm.org/apt/precise/ llvm-toolchain-precise main"
   - sudo apt-get update
+install:
   - sudo apt-get install clang-3.4
+  - sudo apt-get install
   - sudo apt-get install libgmp3-dev
   - sudo apt-get install linux-source
   - sudo apt-get install build-essential
@@ -18,15 +20,3 @@ before_install:
   - sudo apt-get install cmake
   - sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
   - sudo apt-get install libblkid-dev
-install:
-  - tar -xzf tests/emulator/tpm_emulator-0.7.4.tar.gz -C /tmp
-  - cd /tmp/tpm_emulator-0.7.4/
-  - mkdir build
-  - cd build
-  - cmake ../
-  - make
-  - sudo make install
-  - sudo depmod -a
-  - sudo modprobe tpmd_dev
-  - sudo tpmd -d
-
