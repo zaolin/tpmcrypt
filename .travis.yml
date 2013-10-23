@@ -1,14 +1,14 @@
 language: cpp
 script: make
 compiler:
-  - clang
+  #- clang Problems with crypto++ 5.6.1
   - gcc
 before_script:
   - cd bin
   - cmake ../
 before_install:
-  - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
-  - sudo add-apt-repository "deb http://llvm.org/apt/precise/ llvm-toolchain-precise main"
+  #- wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+  #- sudo add-apt-repository "deb http://llvm.org/apt/precise/ llvm-toolchain-precise main"
   - sudo apt-get update
 install:
   - sudo apt-get install clang-3.4
