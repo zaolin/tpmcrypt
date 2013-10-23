@@ -1,0 +1,13 @@
+install:
+  - apt-get update
+  - trousers-dev 
+  - cmake 
+  - crypto++
+language: cpp
+script: make
+compiler:
+  - clang
+  - gcc
+before_script:
+  - cd bin
+  - cmake ../
