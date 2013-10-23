@@ -1,6 +1,6 @@
 before_install:
-  - sudo echo "deb http://llvm.org/apt/precise/ llvm-toolchain-precise main" >> /etc/apt/sources.list.d/llvm.list
-  - sudo echo "deb-src http://llvm.org/apt/precise/ llvm-toolchain-precise main" >> /etc/apt/sources.list.d/llvm.list
+  - sudo add-apt-repository "deb http://llvm.org/apt/precise/ llvm-toolchain-precise main"
+  - sudo add-apt-repository "deb-src http://llvm.org/apt/precise/ llvm-toolchain-precise main"
   - sudo apt-get update
 install:
   - sudo apt-get install trousers libtspi-dev
