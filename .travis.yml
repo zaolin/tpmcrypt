@@ -5,7 +5,8 @@ install:
   - sudo apt-get install cmake 
   - sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
   - sudo apt-get install libblkid-dev
-  - sudo apt-get install clang-3.3
+  - sudo apt-get install aptitude
+  - sudo aptitude search clang
 language: cpp
 script: make
 compiler:
