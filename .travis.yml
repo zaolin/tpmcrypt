@@ -1,8 +1,9 @@
 install:
   - sudo apt-get update
-  - trousers-dev 
-  - cmake 
-  - crypto++
+  - sudo apt-get install trousers libtspi-dev
+  - sudo apt-get install cmake 
+  - sudo apt-get install libcrypto++8 libcrypto++8-dbg libcrypto++-dev
+  - sudo apt-get install libblkid-dev
 language: cpp
 script: make
 compiler:
