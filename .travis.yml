@@ -1,5 +1,5 @@
 install:
-  - apt-get update
+  - sudo apt-get update
   - trousers-dev 
   - cmake 
   - crypto++
