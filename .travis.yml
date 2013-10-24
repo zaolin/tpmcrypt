@@ -17,3 +17,6 @@ install:
   - sudo apt-get install cmake
   - sudo apt-get install libcrypto++9 libcrypto++9-dbg libcrypto++-dev
   - sudo apt-get install libblkid-dev
+  - sudo pip install cpp-coveralls --use-mirrors
+after_success:
+  - coveralls
