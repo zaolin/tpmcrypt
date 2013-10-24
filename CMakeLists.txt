@@ -14,6 +14,7 @@ option(TpmCrypt_BUILD "Build TpmCrypt Tool (tpmcrypt-console)" ON)
 
 # C++ & Compiler Flags
 add_definitions("-O2 -Wall -pedantic -Wextra")
+add_definitions("-fprofile-arcs -ftest-coverage")
 
 # Security Flags
 add_definitions("-Wformat -Wformat-security -Werror=format-security 

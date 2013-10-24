@@ -7,7 +7,8 @@ file(GLOB tpmcrypt-console_SOURCES console.cpp)
 include_directories(include ${tspi_INCLUDE_DIRS} ${blkid_INCLUDE_DIRS} ${cryptopp_INCLUDE_DIRS} ${TpmCrypt_INCLUDE_DIRS})
 
 add_executable(tpmcrypt-console ${TpmCrypt_SOURCES} ${tpmcrypt-console_SOURCES} ${TpmCrypt_HEADERS})
-target_link_libraries(tpmcrypt-console ${tspi_LIBRARIES} ${blkid_LIBRARIES} ${cryptopp_LIBRARIES})
+target_link_libraries(tpmcrypt-console ${tspi_LIBRARIES} ${blkid_LIBRARIES}
+${cryptopp_LIBRARIES} -fprofile-arcs)
 install(TARGETS tpmcrypt-console RUNTIME DESTINATION bin)
 
 if(NOT DEFINED "CMAKE_BUILD_TYPE" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

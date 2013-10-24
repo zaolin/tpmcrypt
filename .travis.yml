@@ -19,4 +19,4 @@ install:
   - sudo apt-get install libblkid-dev
   - sudo pip install cpp-coveralls --use-mirrors
 after_success:
-  - coveralls
+  - coveralls --verbose --exclude CMakeFiles/CompilerIdCXX/CMakeCXXCompilerId.cpp
