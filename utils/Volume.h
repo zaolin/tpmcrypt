@@ -26,20 +26,20 @@ namespace utils {
     class Volume {
     public:
 
-        Volume(std::string name, std::string dev, std::string key, std::string tool, std::string monce) :
-        volumeName(name),
-        volumeDev(dev),
-        volumeKey(key),
-        volumeTool(tool),
-        volumeMonce(monce){
+        Volume() :
+        volumeName(),
+        volumeDev(),
+        volumeKey(),
+        volumeTool(),
+        volumeMonce(){
 
         }
 
-        std::string getName() {
+        std::string getVolumeName() {
             return volumeName;
         }
 
-        std::string getDev() {
+        std::string getDevice() {
             return volumeDev;
         }
 
@@ -59,6 +59,14 @@ namespace utils {
             return volumeMonce;
         }
     private:
+        std::string isDevice(std::string input) {
+            
+        }
+        
+        std::string isAlphaNumeric(std::string input) {
+            
+        }
+        
         std::string volumeName;
         std::string volumeDev;
         std::string volumeKey;

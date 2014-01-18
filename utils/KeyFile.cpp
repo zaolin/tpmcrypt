@@ -25,194 +25,179 @@
 using namespace utils;
 using namespace std;
 
-const static string BEGIN = "-----BEGIN VOLUME-----";
-const static string END = "-----END VOLUME-----";
-const static string NAME = "Volume Name: ";
-const static string DEV = "Device: ";
-const static string TOOL = "Encryption Tool: ";
-const static string MONCE = "Monce: ";
+const static string BEGIN_VOLUME = "-----BEGIN VOLUME-----";
+const static string END_VOLUME = "-----END VOLUME-----";
+const static string BEGIN_MONCE = "-----BEGIN MONCE-----";
+const static string END_MONCE = "-----END MONCE-----";
+const static string BEGIN_KEYBLOB = "-----BEGIN KEYBLOB-----";
+const static string END_KEYBLOB = "-----END KEYBLOB-----";
+const static string VOLUME_NAME = "Volume Name: ";
+const static string DEVICE_NAME = "Device: ";
+const static string TOOL_NAME = "Encryption Tool: ";
 
 KeyFile::KeyFile(string file) :
 keyFilePath(file),
 keyFile(),
-volumes()
-{
-	this->parseFile();
+volumes() {
+    this->parseFile();
 }
 
-KeyFile::~KeyFile()
-{
+KeyFile::~KeyFile() {
 
 }
 
-void KeyFile::parseFile()
-{
-	string line, name, dev, tool, monce;
-	size_t found = 0;
-	stringstream ss;
+void KeyFile::parseFile() {
+    string line, volumeName, deviceName, toolName;
+    size_t found = 0;
+    stringstream key, monce;
 
-	keyFile.open(keyFilePath.c_str(), ios::in);
+    keyFile.open(keyFilePath.c_str(), ios::in);
 
-	if (!keyFile.is_open()) {
+    if (!keyFile.is_open()) {
 
-	}
-	
-	while(keyFile.good()) {
-		getline(keyFile, line);
-		found = line.find(BEGIN);
-		if (found != std::string::npos) {
-			getline(keyFile, line);
-			found = line.find(NAME);
-			
-			if(found == 0) {
-				name = line.substr(NAME.length());
-			} else {
-				continue;
-			}
-			
-			getline(keyFile, line);
-			found = line.find(DEV);
-			
-			if(found == 0) {
-				dev = line.substr(DEV.length());
-			} else {
-				continue;
-			}
-			
-			getline(keyFile, line);
-			found = line.find(TOOL);
-			
-			if(found == 0) {
-				tool = line.substr(TOOL.length());
-			} else {
-				continue;
-			}
-			
-			getline(keyFile, line);
-			found = line.find(MONCE);
-			
-			if(found == 0) {
-				monce = line.substr(MONCE.length());
-			} else {
-				continue;
-			}
-			
-			getline(keyFile, line);
-			if(!line.empty()) {
-				continue;
-			}
-			
-			getline(keyFile, line);
-			while(!line.empty()) {
-				getline(keyFile, line);
-				ss << line;
-			}
-			
-			getline(keyFile, line);
-			found = line.find(END);
-			if (found != std::string::npos) {
-				volumes.push_back(Volume(name, dev, ss.str(), tool, monce));
-			}
-		} else {
-			continue;
-		}
-	}
+    }
 
-	keyFile.close();
+    while (keyFile.good()) {
+        getline(keyFile, line);
+        while (line.find(END_VOLUME) == std::string::npos) {
+            found = line.find(BEGIN_VOLUME);
+            if (found != std::string::npos) {
+                found = line.find(VOLUME_NAME);
+                if (found == 0) {
+                    volumeName = line.substr(VOLUME_NAME.length());
+                }
+                
+                found = line.find(DEVICE_NAME);
+                if (found == 0) {
+                    deviceName = line.substr(DEVICE_NAME.length());
+                }
+
+                found = line.find(TOOL_NAME);
+                if (found == 0) {
+                    toolName = line.substr(TOOL_NAME.length());
+                }
+
+                found = line.find(BEGIN_MONCE);
+                if (found != std::string::npos) {
+                    while (!line.find(END_MONCE)) {
+                        monce << line;
+                        getline(keyFile, line);
+                    }
+                }
+
+                found = line.find(BEGIN_KEYBLOB);
+                if (found != std::string::npos) {
+                    while (!line.find(END_KEYBLOB)) {
+                        key << line;
+                        getline(keyFile, line);
+                    }
+                }
+
+            } else {
+                continue;
+            }
+            getline(keyFile, line);
+        }
+        if( !volumeName.empty() && !deviceName.empty() && !toolName.empty() && key.good() && monce.good() ) {
+                volumes.push_back(Volume(volumeName, deviceName, key.str(), toolName, monce.str()));
+        }
+    }
+
+    keyFile.close();
 }
 
-void KeyFile::flushFile()
-{
-	stringstream ss;
+void KeyFile::flushFile() {
+    keyFile.open(keyFilePath.c_str(), ios::out | ios::trunc);
 
-	keyFile.open(keyFilePath.c_str(), ios::out | ios::trunc);
+    if (!keyFile.is_open()) {
 
-	if (!keyFile.is_open()) {
+    }
 
-	}
+    for (list<Volume>::iterator it = volumes.begin(); it != volumes.end(); ++it) {
+        stringstream key, monce;
+        
+        keyFile << BEGIN_VOLUME << endl;
 
-	for (list<Volume>::iterator it = volumes.begin(); it != volumes.end(); ++it) {
-		keyFile << BEGIN << endl;
+        keyFile << VOLUME_NAME << it->getName() << endl;
+        keyFile << DEVICE_NAME << it->getDev() << endl;
+        keyFile << TOOL_NAME << it->getTool() << endl;
+        
+        monce << it->getMonce() << endl;
+        key << it->getKeyBase64() << endl;
+        
+        keyFile << BEGIN_MONCE << endl;
+        
+        while(!monce.eof()) {
+            if ((monce.tellp() % 64) == 0) {
+                keyFile << endl;
+            }
 
-		keyFile << NAME << it->getName() << endl;
-		keyFile << DEV << it->getDev() << endl;
-		keyFile << TOOL << it->getTool() << endl;
-		keyFile << MONCE << it->getMonce() << endl;
+            keyFile << (char) monce.get();
+        }
+        
+        keyFile << END_MONCE << endl;
+        keyFile << BEGIN_KEYBLOB << endl;
+        
+        while(!key.eof()) {
+            if ((key.tellp() % 64) == 0) {
+                keyFile << endl;
+            }
 
-		ss << it->getKeyBase64() << endl;
+            keyFile << (char) key.get();
+        }
+        
+        keyFile << END_KEYBLOB << endl;
+        keyFile << END_VOLUME << endl;
+    }
 
-		ss.seekg(0, ss.end);
-		int len = ss.tellg();
-		ss.seekg(0, ss.beg);
-
-		for(int i = 0; i < len; ++i) {
-			if ((i % 64) == 0 ) {
-				keyFile << endl;
-			}
-
-			keyFile << (char) ss.get();
-		}
-
-		keyFile << endl;
-
-		ss.str("");
-		ss.clear();
-
-		keyFile << END << endl;
-	}
-
-	keyFile.close();
-	sync();
+    keyFile.close();
+    sync();
 }
 
-void KeyFile::add(Volume vol)
-{
-	if (searchFile(vol.getName()) != volumes.end()) {
-		throw 1;
-	}
+void KeyFile::add(Volume vol) {
+    if (searchFile(vol.getName()) != volumes.end()) {
+        throw 1;
+    }
 
-	volumes.push_back(vol);
-	flushFile();
+    volumes.push_back(vol);
+    flushFile();
 }
 
-void KeyFile::del(string id)
-{
-	list<Volume>::iterator it;
+void KeyFile::del(string id) {
+    list<Volume>::iterator it;
 
-	it = searchFile(id);
+    it = searchFile(id);
 
-	if (it == volumes.end()) {
-		throw 1;
-	}
+    if (it == volumes.end()) {
+        throw 1;
+    }
 
-	volumes.erase(it);
-	flushFile();
+    volumes.erase(it);
+    flushFile();
 }
 
-Volume KeyFile::get(string id)
-{
-	list<Volume>::iterator it;
+Volume KeyFile::get(string id) {
+    list<Volume>::iterator it;
 
-	it = searchFile(id);
+    it = searchFile(id);
 
-	if (it == volumes.end()) {
-		throw 1;
-	}
+    if (it == volumes.end()) {
+        throw 1;
+    }
 
-	return(*it);
+    return (*it);
 }
 
 list<Volume> KeyFile::getAll() {
-	return volumes;
+    return volumes;
 }
 
-list<Volume>::iterator KeyFile::searchFile(string name)
-{
-	for (list<Volume>::iterator it = volumes.begin(); it != volumes.end(); ++it) {
-		if (it->getName() == name) {
-			return it;
-		}
-	}
+list<Volume>::iterator KeyFile::searchFile(string name) {
+    for (list<Volume>::iterator it = volumes.begin(); it != volumes.end(); ++it) {
+        if (it->getName() == name) {
+            return it;
+        }
+    }
 
-	return volumes.end();
+    return volumes.end();
 }

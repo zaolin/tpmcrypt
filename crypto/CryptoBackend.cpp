@@ -68,7 +68,7 @@ CryptoBackend::generateSalt()
 	byte *salt = (byte*) calloc(DEFAULT_SALT_LEN, sizeof(byte));
 
 	if (salt == NULL) {
-
+            throw CryptoBackendException("Can't allocate memory!");
 	}
 
 	rnd.GenerateBlock(salt, DEFAULT_SALT_LEN);
@@ -83,7 +83,7 @@ CryptoBackend::generateIV()
 	byte *iv = (byte*) calloc(AES::BLOCKSIZE, sizeof(byte));
 
 	if (iv == NULL) {
-
+            throw CryptoBackendException("Can't allocate memory!");
 	}
 
 	rnd.GenerateBlock(iv, AES::BLOCKSIZE);
@@ -109,7 +109,7 @@ CryptoBackend::keyDerivation(SecureMem<unsigned char> passphrase, byte *salt)
 		0);
 
 	if (result < 0) {
-
+            throw CryptoBackendException("Can't derive key from passphrase!");
 	}
 
 	return SecureMem<unsigned char>(key, AES::DEFAULT_KEYLENGTH);

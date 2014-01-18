@@ -46,7 +46,19 @@ void foo()
 int
 main(int argc, char** argv)
 {
-        unsigned char tmp[] = "foo";
+	TpmBackend tpm;
+	std::map<unsigned, std::pair<std::string, std::string> > foo;
+	foo = tpm.readPcrs();
+
+	for(std::map<unsigned, std::pair<std::string, std::string> >::iterator it = foo.begin(); it != foo.end(); ++it) {
+		cout << it->first << "\t" << it->second.first << "\t" << it->second.second << endl;
+	}
+
+	//KeyFile keyFile("keyfile.vol");
+	//Volume volume("foo", "/dev/loop0", "blah", CryptSetup::TAG, "foo");
+        //keyFile.add(volume);
+	
+	/*unsigned char tmp[] = "foo";
 	TpmStateMachine tpmState;
         
         SecureMem<unsigned char> password(tmp, 4);
@@ -59,13 +71,12 @@ main(int argc, char** argv)
         cout << "iv" << data.at(1) << endl;
         cout << "salt" << data.at(2) << endl;
         cout << "unecrypted" << foo.getAsUnsecureString() << endl;
-
+	*/
 	//CommandLine cmdParser;
 	//TpmStateMachine tpmState;
 
 	//cmdParser.registerOptionClass<VolumeManagement > ("foooooooooooooooooooooo", "help", CommandLine::NONE);
 	//cmdParser.registerOptionClass<VolumeManagement > ("xxxxxxxxxxxxxxxxw sadsadsa", "blah", CommandLine::NONE);
-
 	//cmdParser.registerOptionFunction(foo, "ajdssfaf", "foo");
 
 	//cmdParser.run(argc, argv);

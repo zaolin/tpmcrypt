@@ -30,12 +30,23 @@
 namespace crypto {
     
     /**
+     * @name CryptoBackendException
+     * @brief Exception wrapper class
+     */
+    class CryptoBackendException : public std::runtime_error {
+    public:
+
+        CryptoBackendException(const std::string& _message) : std::runtime_error(_message) {
+        }
+    };
+    
+    /**
      * @name CryptoBackend
      * @brief Class for cryptography based functions.
      * @detail 
-     * + Supports Secure Random Number Generator for Passphrases.
-     * + Supports Secure Passphrase Input.
-     * + Supports Secure Blob Encryption/Decryption. 
+     * Supports Secure Random Number Generator for Passphrases.
+     * Supports Secure Passphrase Input.
+     * Supports Secure Blob Encryption/Decryption. 
      * @author Philipp Deppenwiese
      * @date 22-10-2013
      */

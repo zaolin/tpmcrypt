@@ -21,12 +21,14 @@
 #include <iostream>
 #include <syslog.h>
 #include <stdarg.h>
+#include <utils/SecureMem.h>
 
 namespace utils {
 
     class Logging {
     public:
         Logging(int level, const std::string &message);
+        Logging(int level, utils::SecureMem<char> sensitive);
         Logging(int level, const std::string &message, const std::string &printMessage);
         ~Logging();
 

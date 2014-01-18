@@ -1,4 +1,4 @@
-/*
+h/*
  *    This file is part of tpmcrypt.
  *
  *    tpmcrypt is free software: you can redistribute it and/or modify
@@ -153,11 +153,12 @@ namespace tpm {
 
         std::string getException(TSS_RESULT err);
 
-        TSS_HCONTEXT hContext;
-        TSS_HTPM hTPM;
-        TpmGlobalState tpmState;
-        TpmManufactur tpmManufactur;
-        unsigned tpmPcrSize;
+        TSS_HCONTEXT    hContext;
+        TSS_HTPM        hTPM;
+        TpmGlobalState  tpmState;
+        TpmManufactur   tpmManufactur;
+        TpmVersion      tpmVersion
+        unsigned        tpmPcrSize;
     };
 }
 

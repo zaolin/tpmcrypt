@@ -47,6 +47,7 @@ tpmPcrSize ( ) {
         tpmState = this->getState();
         tpmManufactur = this->getTpmManufactur();
         tpmPcrSize = this->getPcrSize();
+        tpmVersion = this->getVersion();
     } catch ( TpmBackendException &e ) {
 
         if ( hContext )
@@ -64,6 +65,101 @@ TpmBackend::~TpmBackend ( ) {
     Tspi_Context_Close(hContext);
 }
 
+vector<string> TpmBackend::quoteNow( SecureMem<char> srkPassword, string aik ) {
+    TSS_RESULT err;
+    TSS_HPCRS hPCR;
+    TSS_HKEY hKey;
+    TSS_HPOLICY hSrkPolicy;
+    TSS_HPOLICY hPolicy;
+    TSS_VALIDATION hValid;
+    UINT32 pcrvaluelength;
+    BYTE *pcrvalue;
+    UINT32 *versionInfoLen;
+    BYTE *versionInfo;
+    UINT32 aikLen;
+    BYTE* aikBlob;
+    vector<string> quote;
+    TPM_QUOTE_INFO *quoteInfo;
+    TPM_QUOTE_INFO2 *quote2Info;
+
+    aikLen = aik.length();
+    aikBlob = reinterpret_cast < BYTE* > (aik.c_str());
+
+    hValid.ulExternalDataLength = srkPassword.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPassword.getLen()
+    hValid.rgbExternalData = srkPassword.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPassword.getPointer());
+
+    err = Tspi_Context_LoadKeyByUUID(hContext, TSS_PS_TYPE_SYSTEM, SRK_UUID, &hSRK);
+    if ( err != TSS_SUCCESS ) {
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    err = Tspi_GetPolicyObject(hSRK, TSS_POLICY_USAGE, &hSrkPolicy);
+    if ( err != TSS_SUCCESS ) {
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    err = Tspi_Policy_SetSecret(hSrkPolicy, srkPassword.isEmpty() ? TSS_SECRET_MODE_SHA1 : TSS_SECRET_MODE_PLAIN, srkPassword.isEmpty() ? TPM_SHA1_160_HASH_LEN : srkPassword.getLen(), srkPassword.isEmpty() ? well_known_secret : reinterpret_cast < BYTE* > (srkPassword.getPointer()));
+    if ( err != TSS_SUCCESS ) {
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    err = Tspi_Context_LoadKeyByBlob(hContext, hSRK, aikLen, aikBlob, &hKey);
+    if ( err != TSS_SUCCESS ) {
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    err = Tspi_Context_CreateObject(hContext, TSS_OBJECT_TYPE_PCRS, TSS_PCRS_STRUCT_INFO_SHORT, &hPCR);
+    if ( err != TSS_SUCCESS ) {
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    err = Tspi_PcrComposite_SetPcrLocality(hPCR, TPM_LOC_ZERO);
+    if ( err != TSS_SUCCESS ) {
+        Tspi_Context_CloseObject(hContext, hEncData);
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    for ( int i = 0; i < 24; ++i ) {
+        err = Tspi_TPM_PcrRead(hTPM, i, &pcrvaluelength, &pcrvalue);
+        if ( err != TSS_SUCCESS ) {
+            throw TpmBackendException("TPM Error: " + getException(err));
+        }
+
+        err = Tspi_PcrComposite_SetPcrValue(hPCR, i, pcrvaluelength, pcrvalue);
+        if ( err != TSS_SUCCESS ) {
+            throw TpmBackendException("TPM Error: " + getException(err));
+        }
+
+        pcrvaluelength = 0;
+        pcrvalue = NULL;
+    }
+
+    err = Tspo_TPM_Quote2(hTPM, hKey, FALSE, &hPCR, &hValid, 0, NULL);
+    if ( err != TSS_SUCCESS ) {
+        throw TpmBackendException("TPM Error: " + getException(err));
+    }
+
+    if(  ) {
+        quote2Info = (TPM_QUOTE_INFO2*) hValid.rgbData;
+    } else if( atoi(tpmVersion->version.bMajor) == 1 && atoi(tpmVersion->version.bMinor) < 2 ) {
+        quoteInfo = (TPM_QUOTE_INFO*) hValid.rgbData;
+    }
+
+    try {
+        err = Tspi_Policy_FlushSecret(hPolicy);
+        if ( err != TSS_SUCCESS ) {
+            throw TpmBackendException("TPM Error: " + getException(err));
+        }
+
+        err = Tspi_Policy_FlushSecret(hSrkPolicy);
+        if ( err != TSS_SUCCESS ) {
+            throw TpmBackendException("TPM Error: " + getException(err));
+        }
+    } catch ( exception &e ) {
+
+    }
+}
+
 void TpmBackend::preCalculatePcr ( ) {
 
 }
@@ -71,7 +167,6 @@ void TpmBackend::preCalculatePcr ( ) {
 string TpmBackend::sealBackup ( SecureMem<char> toSeal, SecureMem<char> password ) {
     unsigned loc = 0;
     string emptyPcr = "0000000000000000000000000000000000000000";
-
     try {
         for ( int i = 23; i > 20; i-- ) {
             if ( this->readPcr(i) == emptyPcr ) {
@@ -165,12 +260,10 @@ TpmBackend::TpmState TpmBackend::isEnabled ( ) {
 }
 
 TpmGlobalState TpmBackend::getState ( ) {
-    tpmState = static_cast < TpmGlobalState > (
+    return static_cast < TpmGlobalState > (
             static_cast < int > (isEnabled()) |
             static_cast < int > (isActivated()) |
             static_cast < int > (isOwned()));
-
-    return tpmState;
 }
 
 unsigned TpmBackend::getPcrSize ( ) {
@@ -185,6 +278,13 @@ unsigned TpmBackend::getPcrSize ( ) {
     }
 
     return *( int* ) capData;
+}
+
+TpmVersion TpmBackend::getVersion() {
+    
+
+    
+    return 
 }
 
 TpmManufactur TpmBackend::getTpmManufactur ( ) {

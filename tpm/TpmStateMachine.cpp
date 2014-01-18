@@ -30,9 +30,10 @@ using namespace std;
 
 TpmStateMachine::TpmStateMachine() :
 currentTpmState() {
+    while(true) {
 	switch(currentTpmState = TpmBackend().getState()) {
 		case S1: Logging(LOG_INFO, "Tpm State is fine !");
-		break;
+                return;
 
 		case S2:
 		break;
@@ -51,16 +52,16 @@ currentTpmState() {
 			 needReboot();
 		break;
 
-		case S7:
+		case S7: Logging(LOG_INFO, "Tpm stuck in wrong state, this is normal on Thinkpads !");
 		break;
 
 		case S8: Logging(LOG_INFO, "Tpm is disabled, please activate tpm in bios configuration !");
-			 
-		break;
+		return;
 
 		default:
 		break;
 	}
+    }
 }
 
 TpmStateMachine::~TpmStateMachine() {

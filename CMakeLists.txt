@@ -18,7 +18,7 @@ add_definitions("-fprofile-arcs -ftest-coverage")
 
 # Security Flags
 add_definitions("-Wformat -Wformat-security -Werror=format-security 
--D_FORTIFY_SOURCE=2 -fstack-protector-all --param ssp-buffer-size=4 -fpic -pie")
+-fstack-protector-all --param ssp-buffer-size=4 -fpic -pie")
 
 # Security Linking Flags
 set(CMAKE_SHARED_LINKER_FLAGS "-z,relro,-z,now")
