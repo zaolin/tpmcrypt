@@ -44,6 +44,7 @@ using namespace protocol;
  */
 
 AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
+    /*
     SecureMem<char> dummy;
     CryptSetup tool;
     vector<unsigned> pcrs;
@@ -87,6 +88,7 @@ AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
 
     file.del(volume.getName());
     file.add(Volume(volume.getName(), volume.getDev(), volume.getKey(), volume.getTool(), encrypted));
+    */
 }
 
 AuthenticationProtocol::~AuthenticationProtocol ( ) {

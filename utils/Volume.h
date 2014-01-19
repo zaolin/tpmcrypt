@@ -26,52 +26,22 @@ namespace utils {
     class Volume {
     public:
 
-        Volume() :
-        volumeName(),
-        volumeDev(),
-        volumeKey(),
-        volumeTool(),
-        volumeMonce(){
 
-        }
+        Volume(std::string name,
+               std::string device,
+               std::string key,
+               std::string monce,
+               std::string util );
 
-        std::string getVolumeName() {
-            return volumeName;
-        }
+        ~Volume();
 
-        std::string getDevice() {
-            return volumeDev;
-        }
+        std::string getSerialized();
 
-        std::string getKey() {
-            return volumeKey;
-        }
-        
-        std::string getKeyBase64() {
-            return std::string(const_cast<const char*>(base64_encode(volumeKey.c_str(), volumeKey.length())));
-        }
-        
-        std::string getTool() {
-            return volumeTool;
-        }
-        
-        std::string getMonce() {
-            return volumeMonce;
-        }
-    private:
-        std::string isDevice(std::string input) {
-            
-        }
-        
-        std::string isAlphaNumeric(std::string input) {
-            
-        }
-        
-        std::string volumeName;
-        std::string volumeDev;
-        std::string volumeKey;
-        std::string volumeTool;
-        std::string volumeMonce;
+        std::string name;
+        std::string device;
+        std::string encryptedKey;
+        std::string encryptedMonce;
+        std::string encryptionUtil;
     };
 }
 

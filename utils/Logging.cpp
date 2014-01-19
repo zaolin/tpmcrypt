@@ -21,21 +21,21 @@ using namespace std;
 using namespace utils;
 
 Logging::Logging(int level, const string &message) {
-	openlog( NULL, LOG_CONS | LOG_PID, LOG_USER );
-	syslog(level, "%s", message.c_str());
+    openlog( NULL, LOG_CONS | LOG_PID, LOG_USER );
+    syslog(level, "%s", message.c_str());
 }
 
 Logging::Logging(int level, utils::SecureMem<char> sensitive) {
-        openlog( NULL, LOG_PID, LOG_AUTHPRIV );
-        syslog(level, "%s", sensitive.getAsUnsecureString().c_str());
+    openlog( NULL, LOG_PID, LOG_AUTHPRIV );
+    syslog(level, "%s", sensitive.getAsUnsecureString().c_str());
 }
 
 Logging::Logging(int level, const string &message, const std::string &printMessage) {
-        openlog( NULL, LOG_PID, LOG_USER );
-	syslog(level, "%s", message.c_str());
-	cout << printMessage << endl;
+    openlog( NULL, LOG_PID, LOG_USER );
+    syslog(level, "%s", message.c_str());
+    cout << printMessage << endl;
 }
 
 Logging::~Logging() {
-	closelog();
+    closelog();
 }

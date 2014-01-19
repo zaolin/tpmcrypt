@@ -1,4 +1,4 @@
-h/*
+/*
  *    This file is part of tpmcrypt.
  *
  *    tpmcrypt is free software: you can redistribute it and/or modify
@@ -157,7 +157,7 @@ namespace tpm {
         TSS_HTPM        hTPM;
         TpmGlobalState  tpmState;
         TpmManufactur   tpmManufactur;
-        TpmVersion      tpmVersion
+        TpmVersion      tpmVersion;
         unsigned        tpmPcrSize;
     };
 }
