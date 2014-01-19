@@ -53,12 +53,12 @@ void ToolBackend::call ( string executable, list<string> commands, list<SecureMe
     int status, i = 1;
 
     if ( commands.size() > 255 ) {
-        throw 1;
+        throw ToolBackendException("Too much commands!");
     }
 
     args[0] = strdup(executable.c_str());
 
-    for ( list<string>::iterator it = commands.begin(); it != commands.end(); it++ ) {
+    for ( list<string>::iterator it = commands.begin(); it != commands.end(); ++it ) {
         args[i++] = strdup(it->c_str());
     }
 
@@ -68,7 +68,7 @@ void ToolBackend::call ( string executable, list<string> commands, list<SecureMe
     envp[1] = 0;
 
     if(pipe(out) < 0 || pipe(in) < 0 ) {
-    
+        throw ToolBackendException("Can't initialize pipes!");
     }
 
     posix_spawn_file_actions_init(&action);
@@ -83,14 +83,13 @@ void ToolBackend::call ( string executable, list<string> commands, list<SecureMe
     close(out[0]);
     close(in[1]);
 
-    for ( list<SecureMem<char> >::iterator it = toWrite.begin(); it != toWrite.end(); it++ ) {
+    for ( list<SecureMem<char> >::iterator it = toWrite.begin(); it != toWrite.end(); ++it ) {
         if(write(out[1], it->getPointer(), it->getLen() != it->getLen()))  {
-	
-	}
-        
-	if(write(out[1], "\n", 1) != 1) {
-
-	}
+            throw ToolBackendException("Can't write commands to stdin!");
+        }
+        if(write(out[1], "\n", 1) != 1) {
+            throw ToolBackendException("Can't write commands to stdin!");
+        }
     }
 
     close(out[1]);

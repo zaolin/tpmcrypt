@@ -16,7 +16,6 @@
  */
 
 #include <tpm/TpmBackend.h>
-
 #include <iomanip>
 
 using namespace std;
@@ -44,12 +43,11 @@ tpmPcrSize ( ) {
         if ( err != TSS_SUCCESS )
             throw TpmBackendException("TPM Error: " + getException(err));
 
-        tpmState = this->getState();
-        tpmManufactur = this->getTpmManufactur();
-        tpmPcrSize = this->getPcrSize();
-        tpmVersion = this->getVersion();
+        tpmState        = this->getState();
+        tpmManufactur   = this->getTpmManufactur();
+        tpmPcrSize      = this->getPcrSize();
+        tpmVersion      = this->getVersion();
     } catch ( TpmBackendException &e ) {
-
         if ( hContext )
             Tspi_Context_FreeMemory(hContext, NULL);
 
@@ -65,7 +63,9 @@ TpmBackend::~TpmBackend ( ) {
     Tspi_Context_Close(hContext);
 }
 
+/*
 vector<string> TpmBackend::quoteNow( SecureMem<char> srkPassword, string aik ) {
+
     TSS_RESULT err;
     TSS_HPCRS hPCR;
     TSS_HKEY hKey;
@@ -81,7 +81,7 @@ vector<string> TpmBackend::quoteNow( SecureMem<char> srkPassword, string aik ) {
     vector<string> quote;
     TPM_QUOTE_INFO *quoteInfo;
     TPM_QUOTE_INFO2 *quote2Info;
-
+    
     aikLen = aik.length();
     aikBlob = reinterpret_cast < BYTE* > (aik.c_str());
 
@@ -158,19 +158,20 @@ vector<string> TpmBackend::quoteNow( SecureMem<char> srkPassword, string aik ) {
     } catch ( exception &e ) {
 
     }
+    
 }
+*/
 
 void TpmBackend::preCalculatePcr ( ) {
 
 }
 
 string TpmBackend::sealBackup ( SecureMem<char> toSeal, SecureMem<char> password ) {
-    unsigned loc = 0;
     string emptyPcr = "0000000000000000000000000000000000000000";
     try {
         for ( int i = 23; i > 20; i-- ) {
             if ( this->readPcr(i) == emptyPcr ) {
-                return this->seal(toSeal, loc, vector<unsigned int>(i), password);
+                return this->seal(toSeal, 0, vector<unsigned int>(i), password);
             }
         }
     } catch ( exception &e ) {

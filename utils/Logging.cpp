@@ -21,7 +21,7 @@ using namespace std;
 using namespace utils;
 
 Logging::Logging(int level, const string &message) {
-    openlog( NULL, LOG_CONS | LOG_PID, LOG_USER );
+    openlog( NULL, LOG_PID, LOG_USER );
     syslog(level, "%s", message.c_str());
 }
 

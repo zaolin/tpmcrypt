@@ -15,22 +15,22 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AUTHENTICATIONPROTOCOL_H
-#define	AUTHENTICATIONPROTOCOL_H
+#ifndef LoginProtocol_H
+#define	LoginProtocol_H
 
 #include <iostream>
 #include <utils/Volume.h>
 
 namespace protocol {
 
-    class AuthenticationProtocol {
+    class LoginProtocol {
     public:
-        AuthenticationProtocol(utils::Volume volume);
-        ~AuthenticationProtocol();
+        LoginProtocol(utils::Volume volume);
+        ~LoginProtocol();
 
     };
 }
 
 
-#endif	/* AUTHENTICATIONPROTOCOL_H */
+#endif	/* LoginProtocol_H */
 

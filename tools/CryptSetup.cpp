@@ -43,19 +43,19 @@ string CryptSetup::openVolume ( string dev, SecureMem<char> password ) {
 
     try {
         if ( !this->isAvailable() ) {
-            throw 1;
+            throw CryptSetupException("CryptSetup not found!");
         }
 
         if ( !this->isTool(dev) ) {
-            throw 1;
+            throw CryptSetupException("Isn't a cryptsetup volume!");
         }
 
         if ( access(dev.c_str(), F_OK) != 0 ) {
-            throw 1;
+            throw CryptSetupException("Can't access device file!");
         }
 
         if ( password.isEmpty() ) {
-            throw 1;
+            throw CryptSetupException("CryptSetup not found!");
         }
 
         args.push_back("luksOpen");
@@ -67,10 +67,10 @@ string CryptSetup::openVolume ( string dev, SecureMem<char> password ) {
         call(ToolIdentifier, args, stdout, stdin, &ret);
 
         if ( ret ) {
-            throw 1;
+            throw CryptSetupException("Can't execute command!");
         }
     } catch ( exception &e ) {
-
+        Logging(LOG_ERR, e.what());
     }
 
     return genUniqueName(dev);
@@ -82,29 +82,29 @@ void CryptSetup::closeVolume ( string dev ) {
     list<SecureMem<char> > stdout;
     int ret = 1;
 
-    if ( !this->isAvailable() ) {
-        throw runtime_error("foo");
-    }
+    try {
+        if ( !this->isAvailable() ) {
+            throw CryptSetupException("CryptSetup not found!");
+        }
 
-    if ( !this->isTool(dev) ) {
-        throw runtime_error("foo1");
-    }
+        if ( !this->isTool(dev) ) {
+            throw CryptSetupException("Isn't a cryptsetup volume!");
+        }
 
-    if ( access(dev.c_str(), F_OK) != 0 ) {
-        throw runtime_error("foo2");
-    }
-    /*
-    if (access(genUniqueName(dev).c_str(), F_OK) != 0) {
-            throw runtime_error("foo3");
-    }
-     */
-    args.push_back("luksClose");
-    args.push_back(genUniqueName(dev));
+        if ( access(dev.c_str(), F_OK) != 0 ) {
+            throw CryptSetupException("Can't access device file!");
+        }
 
-    call(ToolIdentifier, args, stdout, stdin, &ret);
+        args.push_back("luksClose");
+        args.push_back(genUniqueName(dev));
 
-    if ( ret ) {
-        throw 1;
+        call(ToolIdentifier, args, stdout, stdin, &ret);
+
+        if ( ret ) {
+            throw CryptSetupException("Can't execute command!");
+        }
+    } catch ( exception &e ) {
+        Logging(LOG_ERR, e.what());
     }
 }
 
@@ -116,36 +116,40 @@ void CryptSetup::createVolume ( string dev, SecureMem<char> password, bool force
     list<SecureMem<char> > stdout;
     int ret = 1;
 
-    if ( !this->isAvailable() ) {
-        throw 1;
-    }
+    try {
+        if ( !this->isAvailable() ) {
+            throw CryptSetupException("CryptSetup not found!");
+        }
 
-    if ( this->isTool(dev) && !force ) {
-        throw 1;
-    }
+        if ( !this->isTool(dev) ) {
+            throw CryptSetupException("Isn't a cryptsetup volume!");
+        }
 
-    if ( access(dev.c_str(), F_OK) != 0 ) {
-        throw 1;
-    }
+        if ( access(dev.c_str(), F_OK) != 0 ) {
+            throw CryptSetupException("Can't access device file!");
+        }
 
-    ss << getCipher(c) << "-" << getMode(m);
+        ss << getCipher(c) << "-" << getMode(m);
 
-    args.push_back("-c");
-    args.push_back(ss.str());
-    args.push_back("-h");
-    args.push_back(getHash(h));
-    args.push_back("-s");
-    args.push_back(getKeySize(k));
-    args.push_back(getEntropy(e));
-    args.push_back("luksFormat");
-    args.push_back(dev);
+        args.push_back("-c");
+        args.push_back(ss.str());
+        args.push_back("-h");
+        args.push_back(getHash(h));
+        args.push_back("-s");
+        args.push_back(getKeySize(k));
+        args.push_back(getEntropy(e));
+        args.push_back("luksFormat");
+        args.push_back(dev);
 
-    stdout.push_back(password);
+        stdout.push_back(password);
 
-    call(ToolIdentifier, args, stdout, stdin, &ret);
+        call(ToolIdentifier, args, stdout, stdin, &ret);
 
-    if ( ret ) {
-        throw 1;
+        if ( ret ) {
+            throw CryptSetupException("Can't execute command!");
+        }
+    } catch ( exception &e ) {
+        Logging(LOG_ERR, e.what());
     }
 }
 
@@ -155,28 +159,32 @@ void CryptSetup::changeVolume ( string dev, SecureMem<char> password, SecureMem<
     int ret = 1;
     string stdin;
 
-    if ( !this->isAvailable() ) {
-        throw 1;
-    }
+    try {
+        if ( !this->isAvailable() ) {
+            throw CryptSetupException("CryptSetup not found!");
+        }
 
-    if ( !this->isTool(dev) ) {
-        throw 1;
-    }
+        if ( !this->isTool(dev) ) {
+            throw CryptSetupException("Isn't a cryptsetup volume!");
+        }
 
-    if ( access(dev.c_str(), F_OK) != 0 ) {
-        throw 1;
-    }
+        if ( access(dev.c_str(), F_OK) != 0 ) {
+            throw CryptSetupException("Can't access device file!");
+        }
 
-    args.push_back("luksChangeKey");
-    args.push_back(dev);
+        args.push_back("luksChangeKey");
+        args.push_back(dev);
 
-    stdout.push_back(password);
-    stdout.push_back(newPassword);
+        stdout.push_back(password);
+        stdout.push_back(newPassword);
 
-    call(ToolIdentifier, args, stdout, stdin, &ret);
+        call(ToolIdentifier, args, stdout, stdin, &ret);
 
-    if ( ret ) {
-        throw 1;
+        if ( ret ) {
+            throw CryptSetupException("Can't execute command!");
+        }
+    } catch ( exception &e ) {
+        Logging(LOG_ERR, e.what());
     }
 }
 
@@ -219,7 +227,7 @@ string CryptSetup::getCipher ( Cipher c ) {
             break;
         case MARS: return "mars";
             break;
-        default: throw 1;
+        default: throw CryptSetupException("Cipher type can't be found!");
             break;
     }
 }
@@ -232,7 +240,7 @@ string CryptSetup::getMode ( Mode m ) {
             break;
         case XTS64: return "xts-plain64";
             break;
-        default: throw 1;
+        default: throw CryptSetupException("Mode type can't be found!");
             break;
     }
 }
@@ -249,7 +257,7 @@ string CryptSetup::getHash ( Hash h ) {
             break;
         case RIPEMD160: return "ripemd160";
             break;
-        default: throw 1;
+        default: throw CryptSetupException("Hash type can't be found!");
             break;
     }
 }
@@ -264,7 +272,7 @@ string CryptSetup::getKeySize ( KeySize k ) {
             break;
         case S512: return "512";
             break;
-        default: throw 1;
+        default: throw CryptSetupException("Key size type can't be found!");
             break;
     }
 }
@@ -275,7 +283,7 @@ string CryptSetup::getEntropy ( Entropy e ) {
             break;
         case URANDOM: return "--use-urandom";
             break;
-        default: throw 1;
+        default: throw CryptSetupException("Entropy source type can't be found!");
             break;
     }
 }

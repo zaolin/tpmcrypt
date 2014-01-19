@@ -96,7 +96,7 @@ CryptoBackend::keyDerivation(SecureMem<unsigned char> passphrase, byte *salt)
 {
 	PKCS5_PBKDF2_HMAC<SHA256> pbkdf2;
 	byte key[AES::DEFAULT_KEYLENGTH];
-	unsigned result = 0;
+	int result = 0;
 
 	result = pbkdf2.DeriveKey(key,
 		AES::DEFAULT_KEYLENGTH,

@@ -15,7 +15,7 @@
  *    along with tpmcrypt.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <protocol/AuthenticationProtocol.h>
+#include <protocol/LoginProtocol.h>
 #include <utils/KeyFile.h>
 #include <utils/Volume.h>
 #include <tools/CryptSetup.h>
@@ -43,7 +43,7 @@ using namespace protocol;
  *
  */
 
-AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
+LoginProtocol::LoginProtocol ( Volume volume ) {
     /*
     SecureMem<char> dummy;
     CryptSetup tool;
@@ -54,21 +54,16 @@ AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
     }
 
     /// Unseal Monce
-    SecureMem<char> decrypted = TpmBackend().unseal(volume.getMonce(), dummy);
-
-    /// Show Monce
-    cout << decrypted.getPointer() << endl;
+    SecureMem<char> decrypted = TpmBackend().unseal(volume.encryptedMonce, dummy);
 
     /// Get Password
     SecureMem<char> password = CryptoBackend().getPassword("Enter password: ");
 
     /// Open Blob 1
-    SecureMem<char> blob1 = TpmBackend().unseal(volume.getKey(), dummy);
-    string unsecure(const_cast < const char* > (blob1.getPointer()), blob1.getLen());
-    string decoded(const_cast < const char* > (base64_decode(unsecure.c_str())));
+    SecureMem<char> blob1 = CryptoBackend().decryptBlob()
 
     /// Unseal Blob2
-    SecureMem<char> blob2 = TpmBackend().unseal(decoded, dummy);
+    SecureMem<char> blob2 = TpmBackend().unseal(blob1, dummy);
 
     /// Open Volume
     tool.openVolume(volume.getDev(), blob2);
@@ -91,7 +86,7 @@ AuthenticationProtocol::AuthenticationProtocol ( Volume volume ) {
     */
 }
 
-AuthenticationProtocol::~AuthenticationProtocol ( ) {
+LoginProtocol::~LoginProtocol ( ) {
 
 }
 

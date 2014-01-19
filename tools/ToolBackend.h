@@ -58,6 +58,17 @@ namespace tools {
         URANDOM
     };
 
+    /**
+     * @name ToolBackend
+     * @brief Exception wrapper class
+     */
+    class ToolBackendException : public std::runtime_error {
+    public:
+
+        ToolBackendException(const std::string& _message) : std::runtime_error(_message) {
+        }
+    };
+
     class ToolBackend {
     public:
         ToolBackend();

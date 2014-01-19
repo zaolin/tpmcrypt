@@ -36,11 +36,6 @@ elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	message("Build debug")
 endif()
 
-#find_package(PkgConfig)
-#pkg_check_modules(redland REQUIRED redland)
-#pkg_check_modules(raptor REQUIRED raptor2)
-#pkg_check_modules(minizip REQUIRED minizip)
-
 find_path(blkid_INCLUDE_DIRS blkid/blkid.h)
 find_library(blkid_LIBRARIES blkid)
 find_package_handle_standard_args(BLKID REQUIRED_VARS
@@ -70,3 +65,4 @@ file(GLOB TpmCrypt_SOURCES crypto/*.cpp externals/*.cpp management/*.cpp protoco
 file(GLOB TpmCrypt_HEADERS crypto/*.h externals/*.h management/*.h protocol/*.h tools/*.h utils/*.h tpm/*.h)
 
 add_subdirectory("cli")
+add_subdirectory("tests")

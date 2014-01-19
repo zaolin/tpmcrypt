@@ -23,6 +23,17 @@
 
 namespace tools {
 
+    /**
+     * @name CryptSetupException
+     * @brief Exception wrapper class
+     */
+    class CryptSetupException : public std::runtime_error {
+    public:
+
+        CryptSetupException(const std::string& _message) : std::runtime_error(_message) {
+        }
+    };
+
     class CryptSetup : public ToolBackend {
     public:
         const static std::string TAG;
